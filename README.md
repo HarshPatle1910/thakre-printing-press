@@ -106,7 +106,7 @@ thakre-printing-press/
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/thakre-printing-press.git
+git clone https://github.com/HarshPatle1910/thakre-printing-press.git
 cd thakre-printing-press
 
 # Install dependencies
