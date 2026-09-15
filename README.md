@@ -220,3 +220,4 @@ This project is private and proprietary to **Thakre Printing Press**.
 <p align="center">
   Built with ❤️ using React + Firebase
 </p>
+# thakre-printing-press
