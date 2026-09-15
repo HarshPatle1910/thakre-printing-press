@@ -1,0 +1,5 @@
+.not-found-page { min-height: 60vh; display: flex; align-items: center; justify-content: center; }
+.not-found-content { text-align: center; }
+.not-found-code { font-size: 8rem; font-weight: var(--font-weight-extrabold); color: var(--color-border); line-height: 1; margin-bottom: var(--space-2); }
+.not-found-content h2 { margin-bottom: var(--space-3); }
+.not-found-content p { margin-bottom: var(--space-8); max-width: 400px; margin-left: auto; margin-right: auto; }

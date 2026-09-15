@@ -1,0 +1,21 @@
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-10); align-items: start; }
+@media (max-width: 767px) { .contact-grid { grid-template-columns: 1fr; } }
+.contact-info { display: flex; flex-direction: column; gap: var(--space-5); }
+.contact-card { display: flex; gap: var(--space-4); padding: var(--space-5); background: var(--color-surface-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); }
+.contact-card__icon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--color-primary-50); color: var(--color-primary); flex-shrink: 0; }
+.contact-card h3 { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-2); color: var(--color-text); }
+.contact-card p, .contact-card a { font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: var(--line-height-relaxed); }
+.contact-card a:hover { color: var(--color-primary); }
+.contact-status { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); margin-bottom: var(--space-3); }
+.contact-status--open { background: var(--color-success-bg); color: var(--color-success); }
+.contact-status--closed { background: var(--color-error-bg); color: var(--color-error); }
+.hours-list { display: flex; flex-direction: column; gap: var(--space-1); }
+.hours-row { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--font-size-sm); padding: var(--space-1) 0; }
+.hours-day { color: var(--color-text-secondary); }
+.hours-time { color: var(--color-text); font-weight: var(--font-weight-medium); }
+.contact-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.contact-map { border-radius: var(--radius-xl); overflow: hidden; min-height: 450px; background: var(--color-surface-alt); }
+.contact-map__iframe { width: 100%; height: 100%; min-height: 450px; border: none; }
+.contact-map__placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); height: 100%; min-height: 450px; color: var(--color-text-tertiary); }
+.contact-map__placeholder p { font-size: var(--font-size-sm); color: var(--color-text-tertiary); }
+.contact-map__placeholder small { font-size: var(--font-size-xs); opacity: 0.6; }

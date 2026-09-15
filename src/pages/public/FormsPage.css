@@ -1,0 +1,14 @@
+.forms-search { display: flex; align-items: center; gap: var(--space-3); max-width: 500px; margin: 0 auto var(--space-8); position: relative; }
+.forms-search svg { position: absolute; left: var(--space-4); color: var(--color-text-tertiary); }
+.forms-search .form-input { padding-left: var(--space-10); }
+.forms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-5); }
+.form-card { background: var(--color-surface-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); overflow: hidden; transition: box-shadow var(--transition-base); }
+.form-card:hover { box-shadow: var(--shadow-md); }
+.form-card__image { width: 100%; height: 160px; object-fit: cover; }
+.form-card__body { padding: var(--space-5); }
+.form-card__body h3 { font-size: var(--font-size-base); margin-bottom: var(--space-2); }
+.form-card__body p { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--space-3); }
+.form-card__meta { display: flex; justify-content: space-between; align-items: center; }
+.form-card__availability { display: flex; align-items: center; gap: var(--space-1); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-success); }
+.form-card__availability--unavailable { color: var(--color-text-tertiary); }
+.form-card__price { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text); }

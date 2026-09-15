@@ -1,0 +1,6 @@
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--color-primary-dark); padding: var(--space-4); }
+.login-card { width: 100%; max-width: 420px; background: var(--color-surface-card); border-radius: var(--radius-xl); padding: var(--space-10); box-shadow: var(--shadow-2xl); }
+.login-brand { text-align: center; margin-bottom: var(--space-8); color: var(--color-primary); }
+.login-brand h1 { font-size: var(--font-size-xl); margin-top: var(--space-3); margin-bottom: var(--space-1); }
+.login-brand p { font-size: var(--font-size-sm); color: var(--color-text-tertiary); }
+.login-error { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-4); background: var(--color-error-bg); color: var(--color-error); border-radius: var(--radius-md); font-size: var(--font-size-sm); margin-bottom: var(--space-4); }

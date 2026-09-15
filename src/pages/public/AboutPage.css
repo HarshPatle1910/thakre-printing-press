@@ -1,0 +1,16 @@
+.about-section { margin-bottom: var(--space-12); }
+.about-section h2 { font-size: var(--font-size-2xl); margin-bottom: var(--space-6); }
+.about-story p { font-size: var(--font-size-md); line-height: var(--line-height-relaxed); color: var(--color-text-secondary); max-width: 800px; margin: 0 auto; text-align: center; }
+.about-family { background: var(--color-surface-alt); padding: var(--space-10); border-radius: var(--radius-xl); text-align: center; }
+.about-family p { max-width: 700px; margin: 0 auto; color: var(--color-text-secondary); }
+.team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--space-6); }
+.team-card { text-align: center; padding: var(--space-6); background: var(--color-surface-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); }
+.team-card__photo { width: 100px; height: 100px; border-radius: var(--radius-full); object-fit: cover; margin: 0 auto var(--space-4); }
+.team-card__photo-placeholder { display: flex; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: var(--radius-full); background: var(--color-surface-alt); color: var(--color-text-tertiary); margin: 0 auto var(--space-4); }
+.team-card h3 { font-size: var(--font-size-md); margin-bottom: var(--space-1); }
+.team-card__role { font-size: var(--font-size-sm); color: var(--color-primary-light); font-weight: var(--font-weight-medium); margin-bottom: var(--space-3); }
+.team-card__bio { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+.about-placeholder { text-align: center; padding: var(--space-12); color: var(--color-text-tertiary); }
+.about-placeholder h3 { margin: var(--space-4) 0 var(--space-2); color: var(--color-text); }
+.about-placeholder p { max-width: 500px; margin: 0 auto var(--space-2); }
+.about-placeholder__note { font-size: var(--font-size-xs); opacity: 0.6; }

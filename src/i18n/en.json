@@ -1,0 +1,138 @@
+{
+  "translation": {
+    "nav": {
+      "home": "Home",
+      "services": "Services",
+      "gallery": "Gallery",
+      "forms": "Forms",
+      "about": "About Us",
+      "faq": "FAQ",
+      "contact": "Contact",
+      "quote": "Get a Quote",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "hero": {
+      "defaultTitle": "Your Trusted Printing Partner in Goregaon",
+      "defaultSubtitle": "Professional printing, designing & document services for every need",
+      "cta": "Get a Quote",
+      "callUs": "Call Us",
+      "whatsapp": "WhatsApp"
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "Comprehensive printing and document solutions for individuals, businesses, and organizations",
+      "viewAll": "View All Services",
+      "viewDetails": "View Details",
+      "enquire": "Enquire Now",
+      "relatedServices": "Related Services",
+      "features": "Features",
+      "subServices": "What We Offer"
+    },
+    "gallery": {
+      "title": "Our Work",
+      "subtitle": "Browse through samples of our printing and design work",
+      "all": "All",
+      "noItems": "No gallery items found",
+      "placeholder": "Sample / Placeholder Image"
+    },
+    "forms": {
+      "title": "Available Forms",
+      "subtitle": "We provide a wide range of printed forms for various purposes",
+      "search": "Search forms...",
+      "available": "Available",
+      "unavailable": "Currently Unavailable",
+      "noForms": "No forms found",
+      "priceOnRequest": "Price on Request"
+    },
+    "about": {
+      "title": "About Us",
+      "subtitle": "Learn about our printing business and family",
+      "familyBusiness": "A Family Business",
+      "teamTitle": "Our Team",
+      "established": "Established"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Find answers to common questions about our services",
+      "noFaqs": "No FAQs available yet"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "subtitle": "Get in touch with us for any printing needs",
+      "address": "Address",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "hours": "Opening Hours",
+      "getDirections": "Get Directions",
+      "closed": "Closed",
+      "openNow": "Open Now",
+      "closedNow": "Closed Now"
+    },
+    "quote": {
+      "title": "Request a Quote",
+      "subtitle": "Tell us about your printing requirements and we'll get back to you",
+      "name": "Your Name",
+      "mobile": "Mobile Number",
+      "email": "Email Address",
+      "service": "Select Service",
+      "quantity": "Quantity",
+      "requirement": "Describe Your Requirement",
+      "additionalNotes": "Additional Instructions",
+      "uploadFiles": "Upload Files",
+      "uploadHint": "Supported: PDF, JPG, PNG, DOC, DOCX (Max 10MB each)",
+      "submit": "Submit Enquiry",
+      "submitting": "Submitting...",
+      "successTitle": "Enquiry Submitted!",
+      "successMessage": "Your enquiry has been received. We will contact you shortly.",
+      "enquiryId": "Your Enquiry ID",
+      "whatsappFollowUp": "Follow up on WhatsApp",
+      "submitAnother": "Submit Another Enquiry",
+      "selectService": "-- Select a Service --",
+      "optional": "Optional",
+      "required": "Required"
+    },
+    "footer": {
+      "tagline": "Professional printing & designing services in Goregaon",
+      "quickLinks": "Quick Links",
+      "ourServices": "Our Services",
+      "contactInfo": "Contact Info",
+      "copyright": "© {{year}} Thakre Printing Press. All rights reserved.",
+      "privacyNotice": "Your uploaded files are handled securely and only used for your printing requirements."
+    },
+    "common": {
+      "loading": "Loading...",
+      "error": "Something went wrong",
+      "retry": "Try Again",
+      "back": "Back",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "search": "Search...",
+      "noResults": "No results found",
+      "viewMore": "View More",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "whatsapp": {
+      "greeting": "Hello! I'm interested in your printing services.",
+      "quoteMessage": "Hi, I'd like to get a quote for {{service}}.",
+      "enquiryMessage": "Hi, I submitted an enquiry (ID: {{id}}). I'd like to follow up.",
+      "serviceMessage": "Hi, I'm interested in your {{service}} service. Can you share more details?"
+    },
+    "notFound": {
+      "title": "Page Not Found",
+      "message": "The page you're looking for doesn't exist or has been moved.",
+      "goHome": "Go to Homepage"
+    }
+  }
+}

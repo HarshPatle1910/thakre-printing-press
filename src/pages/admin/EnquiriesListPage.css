@@ -1,0 +1,80 @@
+.enquiries-list-page {
+  animation: fadeIn var(--transition-base);
+}
+
+.status-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.status-tab {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.status-tab:hover {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+.status-tab--active {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+}
+
+.status-tab__count {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+}
+
+.status-tab--active .status-tab__count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+.cell-id strong {
+  font-family: monospace;
+  color: var(--color-primary);
+}
+
+.cell-customer {
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.customer-phone {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.date-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.table-action-btn--whatsapp:hover {
+  background: #25D366 !important;
+  color: #FFFFFF !important;
+}

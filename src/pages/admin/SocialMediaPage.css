@@ -1,0 +1,9 @@
+.social-media-page {
+  animation: fadeIn var(--transition-base);
+}
+
+.social-input-icon {
+  display: inline;
+  margin-right: 6px;
+  vertical-align: text-bottom;
+}

@@ -1,0 +1,23 @@
+.about-edit-page {
+  animation: fadeIn var(--transition-base);
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.member-card-edit {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.member-card-edit__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}

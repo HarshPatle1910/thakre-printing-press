@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Allow public read and admin write for business CMS collections
+    match /business/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /pages/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /services/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /gallery/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /galleryCategories/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /forms/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /faqs/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /about/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /settings/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Customer Enquiries
+    match /enquiries/{document} {
+      allow read, write: if true;
+    }
+
+    // Users & Roles
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // Activity Logs (append-only)
+    match /activityLogs/{document} {
+      allow read, create: if true;
+      allow update, delete: if false;
+    }
+
+    // Analytics
+    match /analytics/{document} {
+      allow read, write: if true;
+    }
+  }
+}
