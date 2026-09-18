@@ -6,6 +6,7 @@ import Button from '../../components/common/Button';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
+import { formatImageUrl } from '../../utils/helpers';
 import { Save, CheckCircle, AlertCircle, Image, Palette, Eye } from 'lucide-react';
 import './BrandingPage.css';
 
@@ -100,7 +101,7 @@ export default function BrandingPage() {
               value={branding.logo}
               onChange={(e) => handleChange('logo', e.target.value)}
             />
-            <span className="form-hint">Recommended format: PNG, SVG, or WebP with transparent background</span>
+            <span className="form-hint">Recommended format: PNG, SVG, or WebP with transparent background. Supports Google Drive links (&ldquo;Anyone with link can view&rdquo;).</span>
           </div>
 
           <div className="admin-form-grid">
@@ -109,10 +110,11 @@ export default function BrandingPage() {
               <input
                 type="url"
                 className="form-input"
-                placeholder="https://example.com/logo-white.png"
+                placeholder="https://example.com/logo-white.png or Google Drive link"
                 value={branding.logoLight}
                 onChange={(e) => handleChange('logoLight', e.target.value)}
               />
+              <span className="form-hint">Used on dark headers, banners, and footers</span>
             </div>
 
             <div className="form-group">
@@ -120,10 +122,11 @@ export default function BrandingPage() {
               <input
                 type="url"
                 className="form-input"
-                placeholder="https://example.com/favicon.png"
+                placeholder="https://example.com/favicon.png or Google Drive link"
                 value={branding.favicon}
                 onChange={(e) => handleChange('favicon', e.target.value)}
               />
+              <span className="form-hint">Icon displayed in browser tab</span>
             </div>
           </div>
 
@@ -132,11 +135,11 @@ export default function BrandingPage() {
             <input
               type="url"
               className="form-input"
-              placeholder="https://example.com/social-preview.jpg"
+              placeholder="https://example.com/social-preview.jpg or Google Drive link"
               value={branding.socialImage}
               onChange={(e) => handleChange('socialImage', e.target.value)}
             />
-            <span className="form-hint">Recommended size: 1200x630 pixels</span>
+            <span className="form-hint">Recommended size: 1200x630 pixels. Used when sharing link on WhatsApp/Facebook.</span>
           </div>
 
           <div className="form-group">
@@ -159,22 +162,78 @@ export default function BrandingPage() {
 
           <div className="branding-preview-grid">
             <div className="branding-preview-box branding-preview-box--light">
-              <span className="preview-label">Light Surface</span>
+              <span className="preview-label">Light Surface (Main Logo)</span>
               {branding.logo ? (
-                <img src={branding.logo} alt="Light preview" className="preview-img" />
-              ) : (
-                <div className="preview-placeholder">Thakre Printing Press</div>
-              )}
+                <img
+                  src={formatImageUrl(branding.logo)}
+                  alt="Light preview"
+                  className="preview-img"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                  onLoad={(e) => {
+                    e.currentTarget.style.display = 'block';
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.style.display = 'none';
+                  }}
+                />
+              ) : null}
+              <div className="preview-placeholder" style={{ display: branding.logo ? 'none' : 'flex' }}>
+                Thakre Printing Press
+              </div>
             </div>
 
             <div className="branding-preview-box branding-preview-box--dark">
-              <span className="preview-label">Dark Surface</span>
+              <span className="preview-label">Dark Surface (Light / White Logo)</span>
               {branding.logoLight || branding.logo ? (
-                <img src={branding.logoLight || branding.logo} alt="Dark preview" className="preview-img" />
-              ) : (
-                <div className="preview-placeholder preview-placeholder--light">Thakre Printing Press</div>
-              )}
+                <img
+                  src={formatImageUrl(branding.logoLight || branding.logo)}
+                  alt="Dark preview"
+                  className="preview-img"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                  onLoad={(e) => {
+                    e.currentTarget.style.display = 'block';
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.style.display = 'none';
+                  }}
+                />
+              ) : null}
+              <div className="preview-placeholder preview-placeholder--light" style={{ display: (branding.logoLight || branding.logo) ? 'none' : 'flex' }}>
+                Thakre Printing Press
+              </div>
             </div>
+
+            {branding.favicon && (
+              <div className="branding-preview-box branding-preview-box--light">
+                <span className="preview-label">Favicon Preview</span>
+                <img
+                  src={formatImageUrl(branding.favicon)}
+                  alt="Favicon preview"
+                  style={{ width: '48px', height: '48px', objectFit: 'contain', margin: 'auto' }}
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            )}
+
+            {branding.socialImage && (
+              <div className="branding-preview-box branding-preview-box--light">
+                <span className="preview-label">Social Share (OG Preview)</span>
+                <img
+                  src={formatImageUrl(branding.socialImage)}
+                  alt="Social share preview"
+                  style={{ width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '6px', margin: 'auto' }}
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            )}
           </div>
         </section>
 

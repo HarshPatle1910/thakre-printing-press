@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useBusiness } from '../../contexts/BusinessContext';
 import { Phone, MessageCircle, MapPin, Clock, Mail, Navigation } from 'lucide-react';
 import { getPhoneUrl, getGreetingWhatsAppUrl } from '../../utils/whatsapp';
-import { formatPhone, formatTime, isCurrentlyOpen } from '../../utils/helpers';
+import { formatPhone, formatTime, isCurrentlyOpen, getMapEmbedUrl } from '../../utils/helpers';
 import { DAYS_OF_WEEK } from '../../config/constants';
 import Button from '../../components/common/Button';
 import analyticsService from '../../services/analyticsService';
@@ -34,11 +34,11 @@ export default function ContactPage() {
               <div className="contact-card__icon"><MapPin size={24} /></div>
               <div>
                 <h3>{t('contact.address')}</h3>
-                <p>{business.name}</p>
-                <p>{business.address?.line1}</p>
-                <p>{business.address?.line2}</p>
-                <p>{business.address?.city}, {business.address?.district}</p>
-                <p>{business.address?.state}, {business.address?.country}</p>
+                <p>{business?.name}</p>
+                <p>{business?.address?.line1}</p>
+                <p>{business?.address?.line2}</p>
+                <p>{business?.address?.city}{business?.address?.district ? `, ${business.address.district}` : ''}</p>
+                <p>{business?.address?.state}{business?.address?.country ? `, ${business.address.country}` : ''}</p>
               </div>
             </div>
 
@@ -47,8 +47,8 @@ export default function ContactPage() {
               <div className="contact-card__icon"><Phone size={24} /></div>
               <div>
                 <h3>{t('contact.phone')}</h3>
-                <a href={getPhoneUrl(business.phone)} onClick={() => analyticsService.trackPhoneClick()}>
-                  {formatPhone(business.phone)}
+                <a href={getPhoneUrl(business?.phone)} onClick={() => analyticsService.trackPhoneClick()}>
+                  {formatPhone(business?.phone)}
                 </a>
               </div>
             </div>
@@ -58,8 +58,8 @@ export default function ContactPage() {
               <div className="contact-card__icon" style={{ background: 'var(--color-whatsapp)', color: '#fff' }}><MessageCircle size={24} /></div>
               <div>
                 <h3>{t('contact.whatsapp')}</h3>
-                <a href={getGreetingWhatsAppUrl()} target="_blank" rel="noopener noreferrer" onClick={() => analyticsService.trackWhatsAppClick()}>
-                  {formatPhone(business.whatsapp)}
+                <a href={getGreetingWhatsAppUrl(business?.whatsapp)} target="_blank" rel="noopener noreferrer" onClick={() => analyticsService.trackWhatsAppClick()}>
+                  {formatPhone(business?.whatsapp)}
                 </a>
               </div>
             </div>
@@ -74,7 +74,7 @@ export default function ContactPage() {
                 </div>
                 <div className="hours-list">
                   {DAYS_OF_WEEK.map((day) => {
-                    const h = openingHours[day];
+                    const h = openingHours?.[day];
                     return (
                       <div className="hours-row" key={day}>
                         <span className="hours-day">{t(`common.${day}`)}</span>
@@ -90,13 +90,13 @@ export default function ContactPage() {
 
             {/* Actions */}
             <div className="contact-actions">
-              <Button variant="primary" icon={Phone} href={getPhoneUrl(business.phone)} onClick={() => analyticsService.trackPhoneClick()}>
+              <Button variant="primary" icon={Phone} href={getPhoneUrl(business?.phone)} onClick={() => analyticsService.trackPhoneClick()}>
                 {t('common.call')}
               </Button>
-              <Button variant="whatsapp" icon={MessageCircle} href={getGreetingWhatsAppUrl()} target="_blank" onClick={() => analyticsService.trackWhatsAppClick()}>
+              <Button variant="whatsapp" icon={MessageCircle} href={getGreetingWhatsAppUrl(business?.whatsapp)} target="_blank" onClick={() => analyticsService.trackWhatsAppClick()}>
                 {t('common.whatsapp')}
               </Button>
-              {business.location?.googleMapsUrl && (
+              {business?.location?.googleMapsUrl && (
                 <Button variant="outline" icon={Navigation} href={business.location.googleMapsUrl} target="_blank" onClick={handleMapClick}>
                   {t('contact.getDirections')}
                 </Button>
@@ -106,9 +106,9 @@ export default function ContactPage() {
 
           {/* Map */}
           <div className="contact-map">
-            {business.location?.googleMapsUrl ? (
+            {getMapEmbedUrl(business?.location) ? (
               <iframe
-                src={business.location.googleMapsUrl}
+                src={getMapEmbedUrl(business?.location)}
                 title="Business Location"
                 className="contact-map__iframe"
                 loading="lazy"

@@ -6,10 +6,12 @@ import Button from '../../components/common/Button';
 import StatusBadge from '../../components/admin/StatusBadge';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
-import { Plus, Edit, Trash2, Search, Image as ImageIcon } from 'lucide-react';
+import { formatImageUrl } from '../../utils/helpers';
+import { Plus, Edit, Trash2, Search, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-react';
 import './GalleryListPage.css';
 
 export default function GalleryListPage() {
@@ -20,13 +22,16 @@ export default function GalleryListPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [actionMessage, setActionMessage] = useState(null);
 
   useEffect(() => {
     const unsub = firestoreService.subscribeToCollection(
       COLLECTIONS.GALLERY,
       [firestoreService.orderBy('displayOrder', 'asc')],
       (data) => {
-        setItems(data);
+        setItems(data || []);
         setLoading(false);
       },
       (err) => {
@@ -39,20 +44,30 @@ export default function GalleryListPage() {
     return () => unsub();
   }, []);
 
-  const handleDelete = async (id, title) => {
-    if (!window.confirm(`Delete gallery item "${title?.en || title}"?`)) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setActionMessage(null);
     try {
-      await firestoreService.deleteDocument(COLLECTIONS.GALLERY, id);
+      await firestoreService.deleteDocument(COLLECTIONS.GALLERY, deleteTarget.id);
       await activityLogService.logAction(
         user?.uid || 'admin',
         user?.displayName || 'Admin',
         'DELETE_GALLERY_ITEM',
         'gallery',
-        id
+        deleteTarget.id,
+        { title: deleteTarget.title?.en || deleteTarget.title }
       );
+      setActionMessage({
+        type: 'success',
+        text: `Gallery item "${deleteTarget.title?.en || deleteTarget.title}" deleted successfully!`,
+      });
+      setDeleteTarget(null);
     } catch (err) {
-      console.error('Error deleting:', err);
-      setItems((prev) => prev.filter((i) => i.id !== id));
+      console.error('Error deleting gallery item:', err);
+      setActionMessage({ type: 'error', text: 'Failed to delete item: ' + err.message });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -78,6 +93,13 @@ export default function GalleryListPage() {
           </Button>
         }
       />
+
+      {actionMessage && (
+        <div className={`admin-alert admin-alert--${actionMessage.type}`} style={{ marginBottom: '1.25rem' }}>
+          {actionMessage.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+          <span>{actionMessage.text}</span>
+        </div>
+      )}
 
       <div className="admin-toolbar">
         <div className="search-box">
@@ -128,7 +150,7 @@ export default function GalleryListPage() {
             <div key={item.id} className="gallery-admin-card">
               <div className="gallery-admin-card__thumb">
                 {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.title?.en || 'Gallery sample'} />
+                  <img src={formatImageUrl(item.imageUrl)} alt={item.title?.en || 'Gallery sample'} referrerPolicy="no-referrer" />
                 ) : (
                   <div className="gallery-placeholder">
                     <ImageIcon size={32} />
@@ -140,6 +162,11 @@ export default function GalleryListPage() {
               <div className="gallery-admin-card__body">
                 <h3>{item.title?.en || item.title || 'Untitled'}</h3>
                 {item.title?.mr && <p className="text-secondary-sm">{item.title.mr}</p>}
+                {(item.description?.en || (typeof item.description === 'string' && item.description)) && (
+                  <p className="gallery-admin-card__desc">
+                    {item.description?.en || item.description}
+                  </p>
+                )}
 
                 <div className="gallery-admin-card__meta">
                   <StatusBadge status={item.published !== false ? 'PUBLISHED' : 'DRAFT'} />
@@ -149,6 +176,7 @@ export default function GalleryListPage() {
 
               <div className="gallery-admin-card__footer">
                 <button
+                  type="button"
                   className="table-action-btn"
                   onClick={() => navigate(`/admin/gallery/${item.id}`)}
                   title="Edit item"
@@ -156,8 +184,9 @@ export default function GalleryListPage() {
                   <Edit size={16} /> Edit
                 </button>
                 <button
+                  type="button"
                   className="table-action-btn table-action-btn--danger"
-                  onClick={() => handleDelete(item.id, item.title)}
+                  onClick={() => setDeleteTarget(item)}
                   title="Delete item"
                 >
                   <Trash2 size={16} /> Delete
@@ -167,6 +196,17 @@ export default function GalleryListPage() {
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        title="Delete Gallery Item"
+        message="Are you sure you want to delete this gallery item? This will remove the photo and all details permanently."
+        itemName={deleteTarget?.title?.en || deleteTarget?.title || ''}
+        confirmText="Yes, Delete Item"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

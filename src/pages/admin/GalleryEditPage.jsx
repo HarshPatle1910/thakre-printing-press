@@ -7,7 +7,9 @@ import Loader from '../../components/common/Loader';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
-import { Save, ArrowLeft, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { formatImageUrl } from '../../utils/helpers';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import { Save, ArrowLeft, CheckCircle, AlertCircle, Image as ImageIcon, Trash2 } from 'lucide-react';
 import './GalleryEditPage.css';
 
 export default function GalleryEditPage() {
@@ -30,6 +32,29 @@ export default function GalleryEditPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await firestoreService.deleteDocument(COLLECTIONS.GALLERY, id);
+      await activityLogService.logAction(
+        user?.uid || 'admin',
+        user?.displayName || 'Admin',
+        'DELETE_GALLERY_ITEM',
+        'gallery',
+        id,
+        { title: formData.title?.en || 'Gallery Item' }
+      );
+      navigate('/admin/gallery');
+    } catch (err) {
+      console.error('Error deleting item:', err);
+      setMessage({ type: 'error', text: 'Failed to delete item: ' + err.message });
+      setShowDeleteModal(false);
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!isNew) {
@@ -134,16 +159,19 @@ export default function GalleryEditPage() {
             <input
               type="url"
               className="form-input"
-              placeholder="https://images.unsplash.com/..."
+              placeholder="https://images.unsplash.com/... or Google Drive share link"
               value={formData.imageUrl}
               onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
               required
             />
+            <p style={{ marginTop: '0.35rem', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+              Supports direct image links, Firebase Storage, and Google Drive links (make sure file access is &ldquo;Anyone with the link can view&rdquo;).
+            </p>
           </div>
 
           {formData.imageUrl && (
             <div className="gallery-preview-box">
-              <img src={formData.imageUrl} alt="Sample preview" />
+              <img src={formatImageUrl(formData.imageUrl)} alt="Sample preview" referrerPolicy="no-referrer" />
             </div>
           )}
 
@@ -238,6 +266,7 @@ export default function GalleryEditPage() {
             <textarea
               className="form-textarea"
               rows={2}
+              placeholder="e.g., Customized invitation cards with gold foil stamping"
               value={formData.description.en}
               onChange={(e) =>
                 setFormData({
@@ -247,27 +276,65 @@ export default function GalleryEditPage() {
               }
             />
           </div>
+
+          <div className="form-group">
+            <label className="form-label">Description / Work Scope (Marathi / मराठी)</label>
+            <textarea
+              className="form-textarea"
+              rows={2}
+              placeholder="उदा. सोन्याच्या फॉइलसह लग्नपत्रिका आणि डिझायनिंग काम"
+              value={formData.description.mr || ''}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  description: { ...formData.description, mr: e.target.value },
+                })
+              }
+            />
+          </div>
         </section>
 
-        <div className="admin-form-actions">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => navigate('/admin/gallery')}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            icon={Save}
-            loading={saving}
-          >
-            {saving ? 'Saving...' : 'Save Item'}
-          </Button>
+        <div className="admin-form-actions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          {!isNew && (
+            <Button
+              type="button"
+              variant="danger"
+              icon={Trash2}
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete Item
+            </Button>
+          )}
+          <div style={{ display: 'flex', gap: '1rem', marginLeft: isNew ? 'auto' : undefined }}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate('/admin/gallery')}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              icon={Save}
+              loading={saving}
+            >
+              {saving ? 'Saving...' : 'Save Item'}
+            </Button>
+          </div>
         </div>
       </form>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Gallery Item"
+        message="Are you sure you want to delete this gallery item? It will be removed from your portfolio immediately."
+        itemName={formData.title.en}
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 }

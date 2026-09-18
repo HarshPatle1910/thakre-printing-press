@@ -1,13 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, X } from 'lucide-react';
-import { getLocalized } from '../../utils/helpers';
+import { Image, X, Maximize2 } from 'lucide-react';
+import { getLocalized, formatImageUrl } from '../../utils/helpers';
 import firestoreService from '../../services/firestoreService';
 import { COLLECTIONS } from '../../config/constants';
 import analyticsService from '../../services/analyticsService';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import './GalleryPage.css';
+
+const CATEGORY_FALLBACK_NAMES = {
+  'flex-banners': 'Flex & Banners',
+  'visiting-cards': 'Visiting Cards',
+  'wedding-cards': 'Wedding & Invitations',
+  'forms': 'Government & Legal Forms',
+  'bill-books': 'Bill Books & Registers',
+  'posters': 'Posters & Pamphlets',
+  'custom': 'Custom Prints',
+};
 
 export default function GalleryPage() {
   const { t, i18n } = useTranslation();
@@ -20,22 +30,75 @@ export default function GalleryPage() {
 
   useEffect(() => {
     analyticsService.trackPageView('/gallery');
-    Promise.all([
-      firestoreService.getCollection(COLLECTIONS.GALLERY, [
-        firestoreService.where('published', '==', true),
-        firestoreService.orderBy('displayOrder', 'asc'),
-      ]),
-      firestoreService.getCollection(COLLECTIONS.GALLERY_CATEGORIES, [
-        firestoreService.orderBy('displayOrder', 'asc'),
-      ]),
-    ]).then(([galleryData, catData]) => {
-      setItems(galleryData);
-      setCategories(catData);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+
+    let unsubGallery = null;
+    let unsubCategories = null;
+
+    try {
+      unsubGallery = firestoreService.subscribeToCollection(
+        COLLECTIONS.GALLERY,
+        [
+          firestoreService.where('published', '==', true),
+          firestoreService.orderBy('displayOrder', 'asc'),
+        ],
+        (data) => {
+          setItems(data || []);
+          setLoading(false);
+        },
+        async (err) => {
+          console.warn('Fallback fetching gallery items:', err);
+          try {
+            const all = await firestoreService.getCollection(COLLECTIONS.GALLERY);
+            const filtered = (all || [])
+              .filter((i) => i.published !== false)
+              .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+            setItems(filtered);
+          } catch (fetchErr) {
+            console.error('Failed to load gallery items:', fetchErr);
+          } finally {
+            setLoading(false);
+          }
+        }
+      );
+    } catch (e) {
+      console.warn('Error subscribing to gallery:', e);
+    }
+
+    try {
+      unsubCategories = firestoreService.subscribeToCollection(
+        COLLECTIONS.GALLERY_CATEGORIES,
+        [firestoreService.orderBy('displayOrder', 'asc')],
+        (data) => {
+          setCategories(data || []);
+        },
+        async (catErr) => {
+          console.warn('Fallback fetching gallery categories:', catErr);
+          try {
+            const catData = await firestoreService.getCollection(COLLECTIONS.GALLERY_CATEGORIES);
+            setCategories(catData || []);
+          } catch (e) {
+            console.error('Failed to load gallery categories:', e);
+          }
+        }
+      );
+    } catch (e) {
+      console.warn('Error subscribing to categories:', e);
+    }
+
+    return () => {
+      if (typeof unsubGallery === 'function') unsubGallery();
+      if (typeof unsubCategories === 'function') unsubCategories();
+    };
   }, []);
 
-  const filtered = activeCategory === 'all' ? items : items.filter(i => i.category === activeCategory);
+  const getCategoryTitle = (catSlug) => {
+    if (!catSlug) return '';
+    const found = categories.find((c) => c.slug === catSlug);
+    if (found) return getLocalized(found.name, lang);
+    return CATEGORY_FALLBACK_NAMES[catSlug] || catSlug.replace(/-/g, ' ');
+  };
+
+  const filtered = activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory);
 
   if (loading) return <Loader text={t('common.loading')} />;
 
@@ -51,7 +114,10 @@ export default function GalleryPage() {
         {/* Category filters */}
         {categories.length > 0 && (
           <div className="gallery-filters">
-            <button className={`gallery-filter ${activeCategory === 'all' ? 'gallery-filter--active' : ''}`} onClick={() => setActiveCategory('all')}>
+            <button
+              className={`gallery-filter ${activeCategory === 'all' ? 'gallery-filter--active' : ''}`}
+              onClick={() => setActiveCategory('all')}
+            >
               {t('gallery.all')}
             </button>
             {categories.map((cat) => (
@@ -70,19 +136,51 @@ export default function GalleryPage() {
           <EmptyState icon={Image} title={t('gallery.noItems')} />
         ) : (
           <div className="gallery-grid">
-            {filtered.map((item) => (
-              <button className="gallery-item" key={item.id} onClick={() => setLightboxItem(item)} aria-label={getLocalized(item.title, lang)}>
-                <img
-                  src={item.thumbnailUrl || item.imageUrl}
-                  alt={getLocalized(item.altText, lang) || getLocalized(item.title, lang)}
-                  loading="lazy"
-                />
-                <div className="gallery-item__overlay">
-                  <span className="gallery-item__title">{getLocalized(item.title, lang)}</span>
-                  {item.isPlaceholder && <span className="gallery-item__badge">{t('gallery.placeholder')}</span>}
+            {filtered.map((item) => {
+              const itemTitle = getLocalized(item.title, lang) || 'Printing Work';
+              const itemDesc = getLocalized(item.description, lang);
+              const catTitle = getCategoryTitle(item.category);
+
+              return (
+                <div
+                  className="gallery-card"
+                  key={item.id}
+                  onClick={() => setLightboxItem(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && setLightboxItem(item)}
+                  aria-label={`View ${itemTitle}`}
+                >
+                  <div className="gallery-card__thumb">
+                    <img
+                      src={formatImageUrl(item.thumbnailUrl || item.imageUrl)}
+                      alt={getLocalized(item.altText, lang) || itemTitle}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="gallery-card__overlay">
+                      <span className="gallery-card__zoom-btn">
+                        <Maximize2 size={16} />
+                        <span>Preview</span>
+                      </span>
+                    </div>
+                    {catTitle && (
+                      <span className="gallery-card__category-badge">{catTitle}</span>
+                    )}
+                    {item.isPlaceholder && (
+                      <span className="gallery-card__badge">{t('gallery.placeholder')}</span>
+                    )}
+                  </div>
+
+                  <div className="gallery-card__body">
+                    <h3 className="gallery-card__title">{itemTitle}</h3>
+                    {itemDesc && (
+                      <p className="gallery-card__desc">{itemDesc}</p>
+                    )}
+                  </div>
                 </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -94,11 +192,26 @@ export default function GalleryPage() {
             <X size={24} />
           </button>
           <div className="lightbox__content" onClick={(e) => e.stopPropagation()}>
-            <img src={lightboxItem.imageUrl} alt={getLocalized(lightboxItem.altText, lang) || getLocalized(lightboxItem.title, lang)} />
+            <div className="lightbox__image-wrapper">
+              <img
+                src={formatImageUrl(lightboxItem.imageUrl || lightboxItem.thumbnailUrl)}
+                alt={getLocalized(lightboxItem.altText, lang) || getLocalized(lightboxItem.title, lang)}
+                referrerPolicy="no-referrer"
+              />
+            </div>
             <div className="lightbox__info">
+              <div className="lightbox__meta">
+                {lightboxItem.category && (
+                  <span className="lightbox__category-badge">{getCategoryTitle(lightboxItem.category)}</span>
+                )}
+                {lightboxItem.isPlaceholder && (
+                  <span className="lightbox__placeholder-badge">{t('gallery.placeholder')}</span>
+                )}
+              </div>
               <h3>{getLocalized(lightboxItem.title, lang)}</h3>
-              {lightboxItem.description && <p>{getLocalized(lightboxItem.description, lang)}</p>}
-              {lightboxItem.isPlaceholder && <small>{t('gallery.placeholder')}</small>}
+              {getLocalized(lightboxItem.description, lang) && (
+                <p className="lightbox__desc">{getLocalized(lightboxItem.description, lang)}</p>
+              )}
             </div>
           </div>
         </div>

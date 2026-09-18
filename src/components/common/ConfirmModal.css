@@ -1,0 +1,89 @@
+.confirm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: fadeIn 0.15s ease-out;
+}
+
+.confirm-modal-box {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6) var(--space-8);
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.confirm-modal-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.confirm-modal-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.confirm-modal-message {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-3);
+}
+
+.confirm-modal-item-highlight {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-light);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-6);
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.confirm-modal-actions button {
+  flex: 1;
+}
+
+.btn--danger-action {
+  background-color: #ef4444 !important;
+  color: #fff !important;
+  border-color: #ef4444 !important;
+}
+
+.btn--danger-action:hover {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+}

@@ -7,6 +7,7 @@ import Loader from '../../components/common/Loader';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { Save, ArrowLeft, Plus, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import './ServiceEditPage.css';
 
@@ -36,6 +37,29 @@ export default function ServiceEditPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await firestoreService.deleteDocument(COLLECTIONS.SERVICES, id);
+      await activityLogService.logAction(
+        user?.uid || 'admin',
+        user?.displayName || 'Admin',
+        'DELETE_SERVICE',
+        'services',
+        id,
+        { title: formData.title?.en || 'Service' }
+      );
+      navigate('/admin/services');
+    } catch (err) {
+      console.error('Error deleting service:', err);
+      setMessage({ type: 'error', text: 'Failed to delete service: ' + err.message });
+      setShowDeleteModal(false);
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!isNew) {
@@ -414,25 +438,47 @@ export default function ServiceEditPage() {
           </div>
         </section>
 
-        <div className="admin-form-actions">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => navigate('/admin/services')}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            icon={Save}
-            loading={saving}
-          >
-            {saving ? 'Saving...' : 'Save Service'}
-          </Button>
+        <div className="admin-form-actions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          {!isNew && (
+            <Button
+              type="button"
+              variant="danger"
+              icon={Trash2}
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete Service
+            </Button>
+          )}
+          <div style={{ display: 'flex', gap: '1rem', marginLeft: isNew ? 'auto' : undefined }}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate('/admin/services')}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              icon={Save}
+              loading={saving}
+            >
+              {saving ? 'Saving...' : 'Save Service'}
+            </Button>
+          </div>
         </div>
       </form>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Service"
+        message="Are you sure you want to delete this service? All service details, enquiries configuration, and features will be permanently removed."
+        itemName={formData.title.en}
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 }

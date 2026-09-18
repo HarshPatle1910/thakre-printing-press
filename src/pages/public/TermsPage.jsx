@@ -1,4 +1,8 @@
+import { useBusiness } from '../../contexts/BusinessContext';
+
 export default function TermsPage() {
+  const { business } = useBusiness();
+
   return (
     <main className="section">
       <div className="container" style={{ maxWidth: '800px' }}>
@@ -19,7 +23,7 @@ export default function TermsPage() {
           <p>All printing services are subject to availability. Turnaround times are estimates and may vary. We strive to deliver quality printing services and will work with you to resolve any issues.</p>
 
           <h2>Contact</h2>
-          <p>For any questions about these terms, please contact us at: 9923113085</p>
+          <p>For any questions about these terms, please contact {business?.name || 'Thakre Printing Press'} at: {business?.phone || '9923113085'}{business?.email ? ` or email: ${business.email}` : ''}</p>
 
           <p style={{ marginTop: '2rem', fontSize: '0.875rem', color: 'var(--color-text-tertiary)' }}>Last updated: {new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long' })}</p>
         </div>

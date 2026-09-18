@@ -5,6 +5,7 @@ import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
+import { formatImageUrl } from '../../utils/helpers';
 import { Save, Plus, Trash2, CheckCircle, AlertCircle, Users } from 'lucide-react';
 import './AboutEditPage.css';
 
@@ -261,10 +262,21 @@ export default function AboutEditPage() {
                     <input
                       type="url"
                       className="form-input"
-                      placeholder="https://example.com/photo.jpg"
+                      placeholder="https://example.com/photo.jpg or Google Drive link"
                       value={member.photo || ''}
                       onChange={(e) => handleMemberChange(idx, 'photo', null, e.target.value)}
                     />
+                    {member.photo && (
+                      <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <img
+                          src={formatImageUrl(member.photo)}
+                          alt="Photo preview"
+                          referrerPolicy="no-referrer"
+                          style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }}
+                        />
+                        <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>Preview</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

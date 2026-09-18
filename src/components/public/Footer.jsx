@@ -1,15 +1,37 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useBusiness } from '../../contexts/BusinessContext';
 import { Phone, MapPin, Clock, Mail, Printer } from 'lucide-react';
-import { getPhoneUrl, getGreetingWhatsAppUrl } from '../../utils/whatsapp';
-import { formatPhone } from '../../utils/helpers';
+import { getPhoneUrl } from '../../utils/whatsapp';
+import { formatPhone, formatTime, getLocalized, formatImageUrl } from '../../utils/helpers';
+import firestoreService from '../../services/firestoreService';
+import { COLLECTIONS } from '../../config/constants';
 import './Footer.css';
 
 export default function Footer() {
-  const { t } = useTranslation();
-  const { business } = useBusiness();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const { business, openingHours } = useBusiness();
+  const [footerServices, setFooterServices] = useState([]);
+  const [logoError, setLogoError] = useState(false);
   const year = new Date().getFullYear();
+
+  const footerLogo = formatImageUrl(business?.branding?.logoLight || business?.branding?.logo);
+
+  useEffect(() => {
+    setLogoError(false);
+  }, [business?.branding?.logo, business?.branding?.logoLight]);
+
+  useEffect(() => {
+    firestoreService.getCollection(COLLECTIONS.SERVICES, [
+      firestoreService.where('published', '==', true),
+      firestoreService.orderBy('displayOrder', 'asc'),
+      firestoreService.limit(6),
+    ])
+      .then(setFooterServices)
+      .catch((err) => console.error('Failed to load footer services:', err));
+  }, []);
 
   return (
     <footer className="footer">
@@ -17,9 +39,15 @@ export default function Footer() {
         <div className="footer__grid">
           {/* Brand */}
           <div className="footer__section footer__brand-section">
-            <Link to="/" className="footer__brand">
-              {business.branding?.logo ? (
-                <img src={business.branding.logo} alt={business.name} className="footer__logo" />
+            <Link to="/" className="footer__brand" aria-label={business.name}>
+              {footerLogo && !logoError ? (
+                <img
+                  src={footerLogo}
+                  alt={business.name}
+                  className="footer__logo"
+                  referrerPolicy="no-referrer"
+                  onError={() => setLogoError(true)}
+                />
               ) : (
                 <div className="footer__logo-placeholder">
                   <Printer size={24} />
@@ -27,7 +55,7 @@ export default function Footer() {
                 </div>
               )}
             </Link>
-            <p className="footer__tagline">{t('footer.tagline')}</p>
+            <p className="footer__tagline">{business.branding?.tagline || t('footer.tagline')}</p>
 
             {/* Social links */}
             {business.socialLinks && Object.keys(business.socialLinks).some(k => business.socialLinks[k]) && (
@@ -62,6 +90,11 @@ export default function Footer() {
           <div className="footer__section">
             <h4 className="footer__heading">{t('footer.ourServices')}</h4>
             <ul className="footer__links">
+              {footerServices.map((svc) => (
+                <li key={svc.id || svc.slug}>
+                  <Link to={`/services/${svc.slug}`}>{getLocalized(svc.title, lang)}</Link>
+                </li>
+              ))}
               <li><Link to="/services">All Services</Link></li>
               <li><Link to="/forms">{t('nav.forms')}</Link></li>
             </ul>
@@ -91,7 +124,11 @@ export default function Footer() {
               </li>
               <li>
                 <Clock size={16} />
-                <span>Mon–Sat: 9:00 AM – 8:00 PM</span>
+                <span>
+                  {openingHours?.monday?.closed
+                    ? 'Mon–Sat: Closed'
+                    : `Mon–Sat: ${formatTime(openingHours?.monday?.open || '09:00')} – ${formatTime(openingHours?.monday?.close || '20:00')}`}
+                </span>
               </li>
             </ul>
           </div>

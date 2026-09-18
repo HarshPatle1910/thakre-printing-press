@@ -9,13 +9,11 @@ import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import './FAQPage.css';
 
-import { SEED_DATA } from '../../config/seedData';
-
 export default function FAQPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const [faqs, setFaqs] = useState(SEED_DATA.faqs);
-  const [loading, setLoading] = useState(false);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     analyticsService.trackPageView('/faq');
@@ -23,9 +21,24 @@ export default function FAQPage() {
       firestoreService.where('published', '==', true),
       firestoreService.orderBy('displayOrder', 'asc'),
     ]).then((data) => {
-      if (data && data.length > 0) setFaqs(data);
+      setFaqs(data || []);
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch((err) => {
+      console.warn('Fallback fetching FAQs without compound order:', err);
+      firestoreService.getCollection(COLLECTIONS.FAQS)
+        .then((all) => {
+          const published = (all || [])
+            .filter((f) => f.published !== false)
+            .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+          setFaqs(published);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch FAQs from Firebase:', error);
+          setFaqs([]);
+          setLoading(false);
+        });
+    });
   }, []);
 
   if (loading) return <Loader text={t('common.loading')} />;

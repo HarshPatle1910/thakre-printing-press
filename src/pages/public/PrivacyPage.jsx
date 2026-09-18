@@ -1,4 +1,8 @@
+import { useBusiness } from '../../contexts/BusinessContext';
+
 export default function PrivacyPage() {
+  const { business } = useBusiness();
+
   return (
     <main className="section">
       <div className="container" style={{ maxWidth: '800px' }}>
@@ -25,7 +29,7 @@ export default function PrivacyPage() {
           <p>We implement appropriate security measures to protect your personal information and uploaded files. Access to customer data is restricted to authorized staff only.</p>
 
           <h2>Contact</h2>
-          <p>For any privacy-related questions, please contact us at: 9923113085</p>
+          <p>For any privacy-related questions, please contact {business?.name || 'Thakre Printing Press'} at: {business?.phone || '9923113085'}{business?.email ? ` or email: ${business.email}` : ''}</p>
 
           <p style={{ marginTop: '2rem', fontSize: '0.875rem', color: 'var(--color-text-tertiary)' }}>Last updated: {new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long' })}</p>
         </div>

@@ -30,3 +30,55 @@
   .admin-main { margin-left: 60px; }
   .admin-content { padding: var(--space-4); }
 }
+
+/* Global Admin Table Action Buttons */
+.table-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2, 8px);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-secondary, #6b7280);
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.table-action-btn:hover {
+  background: var(--color-surface-alt, #f3f4f6);
+  color: var(--color-text, #111827);
+}
+
+.table-action-btn--danger {
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.table-action-btn--danger:hover {
+  background: var(--color-error-bg, #fef2f2);
+  color: var(--color-error, #dc2626);
+}
+
+/* Global Admin Alert Banner */
+.admin-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--font-size-sm, 14px);
+  margin-bottom: var(--space-4, 16px);
+}
+
+.admin-alert--success {
+  background: var(--color-success-bg, #f0fdf4);
+  color: var(--color-success, #16a34a);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.admin-alert--error {
+  background: var(--color-error-bg, #fef2f2);
+  color: var(--color-error, #dc2626);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+

@@ -7,7 +7,8 @@ import Loader from '../../components/common/Loader';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
-import { Save, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import { Save, ArrowLeft, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
 import './FormEditPage.css';
 
 export default function FormEditPage() {
@@ -30,6 +31,29 @@ export default function FormEditPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await firestoreService.deleteDocument(COLLECTIONS.FORMS, id);
+      await activityLogService.logAction(
+        user?.uid || 'admin',
+        user?.displayName || 'Admin',
+        'DELETE_FORM',
+        'forms',
+        id,
+        { name: formData.name?.en || 'Form' }
+      );
+      navigate('/admin/forms');
+    } catch (err) {
+      console.error('Error deleting form:', err);
+      setMessage({ type: 'error', text: 'Failed to delete form: ' + err.message });
+      setShowDeleteModal(false);
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!isNew) {
@@ -42,6 +66,7 @@ export default function FormEditPage() {
               name: { en: '', mr: '', hi: '', ...(docSnap.name || {}) },
               description: { en: '', mr: '', ...(docSnap.description || {}) },
               priceNote: { en: '', ...(docSnap.priceNote || {}) },
+              published: docSnap.published !== false,
             });
           }
         } catch (err) {
@@ -226,33 +251,58 @@ export default function FormEditPage() {
             <label className="checkbox-label">
               <input
                 type="checkbox"
-                checked={formData.published}
+                checked={formData.published !== false}
                 onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
               />
-              <span>Published on Forms catalog</span>
+              <strong>Visible on Public Website (Published)</strong>
             </label>
+            <small style={{ display: 'block', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+              Check this box to show this form immediately in the public catalog
+            </small>
           </div>
         </section>
 
-        <div className="admin-form-actions">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => navigate('/admin/forms')}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            icon={Save}
-            loading={saving}
-          >
-            {saving ? 'Saving...' : 'Save Form'}
-          </Button>
+        <div className="admin-form-actions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          {!isNew && (
+            <Button
+              type="button"
+              variant="danger"
+              icon={Trash2}
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete Form
+            </Button>
+          )}
+          <div style={{ display: 'flex', gap: '1rem', marginLeft: isNew ? 'auto' : undefined }}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate('/admin/forms')}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              icon={Save}
+              loading={saving}
+            >
+              {saving ? 'Saving...' : 'Save Form'}
+            </Button>
+          </div>
         </div>
       </form>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Form"
+        message="Are you sure you want to delete this form? It will no longer be listed in the government forms registry."
+        itemName={formData.name.en}
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 }

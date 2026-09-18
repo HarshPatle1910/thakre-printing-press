@@ -1,0 +1,201 @@
+================================================================================
+          THAKRE PRINTING PRESS — WEBSITE DATA & CONTENT REQUIREMENTS
+================================================================================
+Instructions:
+Please fill out the information below for each section. You can share this 
+text file with the shop owner or team to collect real details, photos, and 
+pricing to update the website and CMS Admin Panel.
+================================================================================
+
+--------------------------------------------------------------------------------
+1. BUSINESS PROFILE & CONTACT DETAILS
+--------------------------------------------------------------------------------
+• Business Name (Official) : Thakre Printing Press
+• Business Tagline         : Quality Printing & Designing at Goregaon
+• Owner / Proprietor Name  : Sachin Thakre
+• Established Year         : 2012 (Change if different: ________)
+• Primary Phone (Calling)  : 9923113085 (Alternate: ________________)
+• WhatsApp Number          : 9923113085
+• Official Email Address   : ________________________________________
+
+• Physical Shop Address:
+  - Shop / House No.       : ________________________________________
+  - Street / Road Line 1   : Beside Jamya Timya Zilla Parishad School
+  - Landmark / Line 2      : Goregaon Main Road, Gondia–Kohmara Road
+  - Village / Town / City  : Goregaon
+  - Taluka / District      : Gondia
+  - State                  : Maharashtra
+  - PIN Code               : 441801
+
+• Short Description (1-2 sentences summarizing services):
+  - English : Professional printing, designing & document services in Goregaon, Gondia.
+  - Marathi : गोरेगाव, गोंदिया येथील व्यावसायिक प्रिंटिंग, डिझायनिंग आणि दस्तऐवज सेवा.
+  - Hindi   : गोरेगांव, गोंदिया में पेशेवर प्रिंटिंग, डिज़ाइनिंग और दस्तावेज़ सेवाएं।
+
+
+--------------------------------------------------------------------------------
+2. BRANDING & MEDIA ASSETS (FILES TO COLLECT)
+--------------------------------------------------------------------------------
+[ ] 1. Official Logo (High resolution PNG with transparent background)
+[ ] 2. Shop Front Photo (Exterior view of shop banner/signboard for hero/contact page)
+[ ] 3. Workshop / Printing Machine Photos (Inside view showing digital flex printer, offset, etc.)
+[ ] 4. Owner Photo (Clean portrait of Sachin Thakre for the "About Us" section)
+[ ] 5. Social Share Banner (1200x630 px preview image for WhatsApp links)
+
+
+--------------------------------------------------------------------------------
+3. OPENING HOURS & HOLIDAYS
+--------------------------------------------------------------------------------
+• Monday    : [ ] Open: 09:00 AM to 08:00 PM   [ ] Closed
+• Tuesday   : [ ] Open: 09:00 AM to 08:00 PM   [ ] Closed
+• Wednesday : [ ] Open: 09:00 AM to 08:00 PM   [ ] Closed
+• Thursday  : [ ] Open: 09:00 AM to 08:00 PM   [ ] Closed
+• Friday    : [ ] Open: 09:00 AM to 08:00 PM   [ ] Closed
+• Saturday  : [ ] Open: 09:00 AM to 08:00 PM   [ ] Closed
+• Sunday    : [ ] Closed   [ ] Open: ______ AM to ______ PM
+• Lunch / Break Time (if any): ________________________________________
+• Holiday Notice / Seasonal Policy: ___________________________________
+
+
+--------------------------------------------------------------------------------
+4. LOCATION & GOOGLE MAPS
+--------------------------------------------------------------------------------
+• Google Maps Link / Share URL: ________________________________________
+• Exact Latitude / Longitude   : 21.2437, 80.2084
+• Driving Landmark Directions  : Beside Jamya Timya ZP School, Goregaon Main Road
+
+
+--------------------------------------------------------------------------------
+5. SOCIAL MEDIA & ONLINE PROFILES
+--------------------------------------------------------------------------------
+• Google Business Profile Link : ________________________________________
+• Instagram Profile URL        : ________________________________________
+• Facebook Page URL            : ________________________________________
+• YouTube Channel URL (if any) : ________________________________________
+
+
+--------------------------------------------------------------------------------
+6. SERVICES CATALOG & PRICING
+--------------------------------------------------------------------------------
+For each service, provide:
+- Starting price or rate (per sq. ft. or per piece)
+- Available sizes & options
+- Minimum order quantity (MOQ)
+- Standard completion / delivery time
+
+1. FLEX & BANNER PRINTING:
+   - Types Offered    : [ ] Normal Flex  [ ] Star Flex  [ ] Backlit  [ ] Vinyl  [ ] Standees
+   - Rate / Sq. Ft.   : ₹ ________ / sq.ft
+   - Delivery Time    : Urgent within 2-4 hours available? [ ] Yes  [ ] No
+   - Sample Photos    : [ ] Collected
+
+2. VISITING CARDS & STATIONERY:
+   - Paper GSM        : [ ] 300 GSM  [ ] 350 GSM  [ ] Textured
+   - Finishes         : [ ] Velvet Matte  [ ] Gloss  [ ] Spot UV  [ ] Foil Stamping
+   - Minimum Quantity : [ ] 500 cards  [ ] 1000 cards
+   - Approx Pricing   : ₹ ________ for 1000 cards
+   - Sample Photos    : [ ] Collected
+
+3. WEDDING & INVITATION CARDS (लग्न व आमंत्रण पत्रिका):
+   - Designs Available: [ ] Traditional Marathi  [ ] Laser Cut  [ ] Box Cards  [ ] Modern
+   - Language Support : [ ] Marathi  [ ] Hindi  [ ] English
+   - Price Range      : From ₹ ________ to ₹ ________ per card
+   - Sample Photos    : [ ] Collected
+
+4. BILL BOOKS, CHALLANS & REGISTERS:
+   - Paper Type       : [ ] NCR Carbonless  [ ] Regular Carbon Paper
+   - Copies           : [ ] Duplicate (1+1)  [ ] Triplicate (1+2)
+   - Binding / Serial : [ ] Serial Numbered  [ ] Perforated
+   - Pricing          : ₹ ________ per book
+   - Sample Photos    : [ ] Collected
+
+5. OTHER SERVICES (Check all that apply & add rates):
+   - [ ] Xerox / Photocopy (B&W / Color) : Rate: ₹ ______ / page
+   - [ ] Lamination (A4 / ID / Poster)   : Rate: ₹ ______
+   - [ ] Spiral & Hard Binding           : Rate: ₹ ______
+   - [ ] Glow Sign Boards / Acrylic      : Rate: ₹ ______
+   - [ ] Rubber Stamps / Self-Inking     : Rate: ₹ ______
+   - [ ] Pamphlets / Flyers              : Rate: ₹ ______ per 1000
+
+
+--------------------------------------------------------------------------------
+7. GOVERNMENT & LEGAL FORMS CATALOG
+--------------------------------------------------------------------------------
+Forms sold or processed at the counter (Provide selling price per form):
+• 7/12 Land Revenue Extract (७/१२ उतारा अर्ज)           : Price ₹ 10  (Actual: ₹ ____)
+• General Stamp Affidavit Format (सर्वसाधारण प्रतिज्ञापत्र) : Price ₹ 20  (Actual: ₹ ____)
+• Income Certificate Form (उत्पन्न दाखला अर्ज)           : Price ₹ 15  (Actual: ₹ ____)
+• Caste Certificate Form (जात प्रमाणपत्र अर्ज)            : Price ₹ 15  (Actual: ₹ ____)
+• RTO Learning License Form (ड्रायव्हिंग लायसन्स अर्ज)    : Price ₹ 25  (Actual: ₹ ____)
+• Other Local / Tehsildar / Court Forms:
+  1. _____________________________________________ : Price ₹ ____
+  2. _____________________________________________ : Price ₹ ____
+  3. _____________________________________________ : Price ₹ ____
+
+
+--------------------------------------------------------------------------------
+8. GALLERY / PORTFOLIO ITEMS (REAL WORK PHOTOS)
+--------------------------------------------------------------------------------
+Photos of actual completed printing jobs by Thakre Printing Press:
+1. Category: Flex Banners     - Photo filename: ________________________
+2. Category: Flex Banners     - Photo filename: ________________________
+3. Category: Visiting Cards   - Photo filename: ________________________
+4. Category: Wedding Cards    - Photo filename: ________________________
+5. Category: Bill Books       - Photo filename: ________________________
+6. Category: Hoardings/Board  - Photo filename: ________________________
+
+
+--------------------------------------------------------------------------------
+9. "ABOUT US" STORY & TEAM
+--------------------------------------------------------------------------------
+• Founding Background : How Thakre Printing Press started in Goregaon:
+  ______________________________________________________________________________
+  ______________________________________________________________________________
+
+• Owner Bio:
+  - Name       : Sachin Thakre
+  - Role       : Founder & Managing Director
+  - Experience : e.g., 12+ years in digital printing and customer service
+
+• Machines & Technology (Highlights to show trust):
+  - Digital Flex Printing Machine model : ______________________________________
+  - Color Xerox / Digital Offset machine : ______________________________________
+  - Cutting & Lamination equipment       : ______________________________________
+
+
+--------------------------------------------------------------------------------
+10. FREQUENTLY ASKED QUESTIONS (FAQs)
+--------------------------------------------------------------------------------
+• Question 1: How can customers send their files for printing?
+  Answer    : WhatsApp (9923113085) or Email. Accepted: PDF, JPG, CDR, PSD.
+
+• Question 2: What is the turnaround time for urgent banners?
+  Answer    : Ready within 2 to 4 hours depending on size and queue.
+
+• Question 3: What payment methods are accepted?
+  Answer    : Cash, UPI (PhonePe, Google Pay, Paytm, BHIM).
+
+• Question 4: Do you provide custom design / proofing assistance?
+  Answer    : Yes, in-house Marathi & English typing and design proofing available.
+
+• Custom Question 5: ___________________________________________________________
+  Answer             : ___________________________________________________________
+
+
+--------------------------------------------------------------------------------
+11. HOMEPAGE ANNOUNCEMENT BANNER (OPTIONAL)
+--------------------------------------------------------------------------------
+• Banner Enabled: [ ] Yes   [ ] No
+• Seasonal Message (e.g. Festival offer, wedding card discount):
+  English: ___________________________________________________________________
+  Marathi: ___________________________________________________________________
+
+
+--------------------------------------------------------------------------------
+12. ADMIN CREDENTIALS & ENQUIRY ROUTING
+--------------------------------------------------------------------------------
+• Primary Admin Login Email : admin@thakre.com (or custom owner email: ____________)
+• Password Reset Security Question: "Enter your son name"
+• Security Answer           : Ved Thakre (or custom: _______________________)
+• Enquiry Notifications     : Receive quote alerts on: [ ] WhatsApp  [ ] Email
+================================================================================

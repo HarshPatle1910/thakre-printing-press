@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, MessageCircle, ArrowRight } from 'lucide-react';
-import { getLocalized } from '../../utils/helpers';
+import { getLocalized, formatImageUrl } from '../../utils/helpers';
 import { getServiceWhatsAppUrl } from '../../utils/whatsapp';
+import { useBusiness } from '../../contexts/BusinessContext';
 import firestoreService from '../../services/firestoreService';
 import analyticsService from '../../services/analyticsService';
 import { COLLECTIONS } from '../../config/constants';
@@ -15,6 +16,7 @@ import './ServiceDetailPage.css';
 export default function ServiceDetailPage() {
   const { slug } = useParams();
   const { t, i18n } = useTranslation();
+  const { business } = useBusiness();
   const lang = i18n.language;
   const [service, setService] = useState(null);
   const [relatedServices, setRelatedServices] = useState([]);
@@ -25,29 +27,51 @@ export default function ServiceDetailPage() {
     setLoading(true);
     setError(false);
 
-    firestoreService.getCollection(COLLECTIONS.SERVICES, [
-      firestoreService.where('slug', '==', slug),
-      firestoreService.limit(1),
-    ]).then((results) => {
-      if (results.length > 0) {
-        setService(results[0]);
-        analyticsService.trackServiceView(slug);
-        // Load related services
-        firestoreService.getCollection(COLLECTIONS.SERVICES, [
-          firestoreService.where('published', '==', true),
-          firestoreService.orderBy('displayOrder', 'asc'),
-          firestoreService.limit(4),
-        ]).then((all) => {
-          setRelatedServices(all.filter(s => s.slug !== slug).slice(0, 3));
-        });
-      } else {
+    async function loadService() {
+      try {
+        let found = null;
+        // 1. Try finding by slug
+        const results = await firestoreService.getCollection(COLLECTIONS.SERVICES, [
+          firestoreService.where('slug', '==', slug),
+          firestoreService.limit(1),
+        ]);
+
+        if (results && results.length > 0) {
+          found = results[0];
+        } else {
+          // 2. Try finding directly by document ID
+          const docDirect = await firestoreService.getDocument(COLLECTIONS.SERVICES, slug);
+          if (docDirect) {
+            found = docDirect;
+          }
+        }
+
+        if (found) {
+          setService(found);
+          analyticsService.trackServiceView(slug);
+
+          // Load related services from Firebase
+          try {
+            const allServices = await firestoreService.getCollection(COLLECTIONS.SERVICES, [
+              firestoreService.where('published', '==', true),
+              firestoreService.limit(6),
+            ]);
+            setRelatedServices((allServices || []).filter(s => s.id !== found.id && s.slug !== found.slug).slice(0, 3));
+          } catch (relatedErr) {
+            console.warn('Error loading related services:', relatedErr);
+          }
+        } else {
+          setError(true);
+        }
+      } catch (err) {
+        console.error('Error loading service from Firebase:', err);
         setError(true);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }).catch(() => {
-      setError(true);
-      setLoading(false);
-    });
+    }
+
+    loadService();
   }, [slug]);
 
   if (loading) return <Loader text={t('common.loading')} />;
@@ -80,7 +104,7 @@ export default function ServiceDetailPage() {
               <Button
                 variant="whatsapp"
                 icon={MessageCircle}
-                href={getServiceWhatsAppUrl(title)}
+                href={getServiceWhatsAppUrl(title, business?.whatsapp)}
                 target="_blank"
                 onClick={() => analyticsService.trackWhatsAppClick()}
               >
@@ -90,7 +114,7 @@ export default function ServiceDetailPage() {
           </div>
           {service.heroImage && (
             <div className="service-detail__hero-image">
-              <img src={service.heroImage} alt={title} />
+              <img src={formatImageUrl(service.heroImage)} alt={title} referrerPolicy="no-referrer" />
             </div>
           )}
         </div>
@@ -140,7 +164,7 @@ export default function ServiceDetailPage() {
             <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right" href={`/quote?service=${service.id}`}>
               {t('hero.cta')}
             </Button>
-            <Button variant="whatsapp" size="lg" icon={MessageCircle} href={getServiceWhatsAppUrl(title)} target="_blank">
+            <Button variant="whatsapp" size="lg" icon={MessageCircle} href={getServiceWhatsAppUrl(title, business?.whatsapp)} target="_blank">
               {t('common.whatsapp')}
             </Button>
           </div>

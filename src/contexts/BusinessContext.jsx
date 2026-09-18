@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { COLLECTIONS } from '../config/constants';
+import { formatImageUrl } from '../utils/helpers';
 
 const BusinessContext = createContext(null);
 
@@ -91,6 +92,22 @@ export function BusinessProvider({ children }) {
       unsubHours();
     };
   }, []);
+
+  // Dynamically update browser tab favicon if configured
+  useEffect(() => {
+    if (business?.branding?.favicon) {
+      const formatted = formatImageUrl(business.branding.favicon);
+      if (formatted) {
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        link.href = formatted;
+      }
+    }
+  }, [business?.branding?.favicon]);
 
   const getLocalizedField = (field, lang = 'en') => {
     if (!field) return '';

@@ -6,6 +6,7 @@ import { Menu, X, Phone, Printer } from 'lucide-react';
 import LanguageSwitcher from '../common/LanguageSwitcher';
 import Button from '../common/Button';
 import { getPhoneUrl } from '../../utils/whatsapp';
+import { formatImageUrl } from '../../utils/helpers';
 import analyticsService from '../../services/analyticsService';
 import './Header.css';
 
@@ -15,6 +16,13 @@ export default function Header() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+
+  const logoSrc = formatImageUrl(business?.branding?.logo || business?.branding?.logoLight);
+
+  useEffect(() => {
+    setLogoError(false);
+  }, [business?.branding?.logo, business?.branding?.logoLight]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -24,7 +32,7 @@ export default function Header() {
 
   useEffect(() => {
     setMenuOpen(false);
-  }, [location.pathname]);
+  }, [location]);
 
   const navLinks = [
     { path: '/', label: t('nav.home') },
@@ -44,8 +52,14 @@ export default function Header() {
     <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
       <div className="container header__container">
         <Link to="/" className="header__brand" aria-label={business.name}>
-          {business.branding?.logo ? (
-            <img src={business.branding.logo} alt={business.name} className="header__logo" />
+          {logoSrc && !logoError ? (
+            <img
+              src={logoSrc}
+              alt={business.name}
+              className="header__logo"
+              referrerPolicy="no-referrer"
+              onError={() => setLogoError(true)}
+            />
           ) : (
             <div className="header__logo-placeholder">
               <Printer size={24} />

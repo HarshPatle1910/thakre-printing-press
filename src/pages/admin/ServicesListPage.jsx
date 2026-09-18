@@ -6,10 +6,11 @@ import Button from '../../components/common/Button';
 import StatusBadge from '../../components/admin/StatusBadge';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
-import { Plus, Edit, Trash2, Search, Package, Check, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Package, Check, X, CheckCircle, AlertCircle } from 'lucide-react';
 import './ServicesListPage.css';
 
 export default function ServicesListPage() {
@@ -19,19 +20,20 @@ export default function ServicesListPage() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [actionMessage, setActionMessage] = useState(null);
 
   useEffect(() => {
     const unsub = firestoreService.subscribeToCollection(
       COLLECTIONS.SERVICES,
       [firestoreService.orderBy('displayOrder', 'asc')],
       (data) => {
-        setServices(data);
+        setServices(data || []);
         setLoading(false);
       },
       (err) => {
         console.error('Error fetching services:', err);
-        // Fallback default services if firestore isn't populated
         setServices(DEFAULT_SERVICES);
         setLoading(false);
       }
@@ -56,31 +58,36 @@ export default function ServicesListPage() {
       );
     } catch (err) {
       console.error('Failed to update status:', err);
-      // Local fallback update
       setServices((prev) =>
         prev.map((s) => (s.id === service.id ? { ...s, published: newStatus } : s))
       );
     }
   };
 
-  const handleDelete = async (id, title) => {
-    if (!window.confirm(`Are you sure you want to delete "${title?.en || title}"?`)) return;
-
-    setDeletingId(id);
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setActionMessage(null);
     try {
-      await firestoreService.deleteDocument(COLLECTIONS.SERVICES, id);
+      await firestoreService.deleteDocument(COLLECTIONS.SERVICES, deleteTarget.id);
       await activityLogService.logAction(
         user?.uid || 'admin',
         user?.displayName || 'Admin',
         'DELETE_SERVICE',
         'services',
-        id
+        deleteTarget.id,
+        { title: deleteTarget.title?.en || deleteTarget.title }
       );
+      setActionMessage({
+        type: 'success',
+        text: `Service "${deleteTarget.title?.en || deleteTarget.title}" deleted successfully!`,
+      });
+      setDeleteTarget(null);
     } catch (err) {
       console.error('Error deleting service:', err);
-      setServices((prev) => prev.filter((s) => s.id !== id));
+      setActionMessage({ type: 'error', text: 'Failed to delete service: ' + err.message });
     } finally {
-      setDeletingId(null);
+      setDeleting(false);
     }
   };
 
@@ -104,6 +111,13 @@ export default function ServicesListPage() {
           </Button>
         }
       />
+
+      {actionMessage && (
+        <div className={`admin-alert admin-alert--${actionMessage.type}`} style={{ marginBottom: '1.25rem' }}>
+          {actionMessage.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+          <span>{actionMessage.text}</span>
+        </div>
+      )}
 
       <div className="admin-toolbar">
         <div className="search-box">
@@ -187,9 +201,9 @@ export default function ServicesListPage() {
                       <Edit size={16} />
                     </button>
                     <button
+                      type="button"
                       className="table-action-btn table-action-btn--danger"
-                      onClick={() => handleDelete(service.id, service.title)}
-                      disabled={deletingId === service.id}
+                      onClick={() => setDeleteTarget(service)}
                       title="Delete Service"
                     >
                       <Trash2 size={16} />
@@ -201,6 +215,17 @@ export default function ServicesListPage() {
           </table>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        title="Delete Service"
+        message="Are you sure you want to delete this service? All service details, specifications, and inquiries will be permanently removed."
+        itemName={deleteTarget?.title?.en || deleteTarget?.title || ''}
+        confirmText="Yes, Delete Service"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

@@ -105,9 +105,59 @@ export function isCurrentlyOpen(openingHours) {
 }
 
 /**
+ * Get map embed URL from location object
+ */
+export function getMapEmbedUrl(location) {
+  if (!location) return null;
+  if (location.googleMapsUrl && location.googleMapsUrl.includes('output=embed')) {
+    return location.googleMapsUrl;
+  }
+  const lat = location.lat || 21.2437;
+  const lng = location.lng || 80.2084;
+  return `https://maps.google.com/maps?q=${lat},${lng}&hl=en&z=15&output=embed`;
+}
+
+/**
  * Truncate text to a max length
  */
 export function truncate(text, maxLength = 150) {
   if (!text || text.length <= maxLength) return text;
   return text.slice(0, maxLength).trim() + '...';
 }
+
+/**
+ * Format image URL: converts Google Drive sharing links and Dropbox links to direct image CDN links
+ */
+export function formatImageUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+
+  // Already a direct Google User Content link
+  if (trimmed.includes('lh3.googleusercontent.com/d/')) {
+    return trimmed;
+  }
+
+  // Google Drive sharing links or paths (e.g., https://drive.google.com/file/d/ID/... or /file/d/ID/...)
+  if (trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com') || trimmed.includes('/file/d/')) {
+    const fileIdMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/i);
+    if (fileIdMatch && fileIdMatch[1]) {
+      return `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
+    }
+    const idParamMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/i);
+    if (idParamMatch && idParamMatch[1]) {
+      return `https://lh3.googleusercontent.com/d/${idParamMatch[1]}`;
+    }
+  }
+
+  // Dropbox links (ensure raw=1 so it serves image bytes)
+  if (trimmed.includes('dropbox.com')) {
+    if (trimmed.match(/[?&]dl=0/)) {
+      return trimmed.replace(/([?&])dl=0/, '$1raw=1');
+    }
+    return trimmed.includes('?') ? `${trimmed}&raw=1` : `${trimmed}?raw=1`;
+  }
+
+  return trimmed;
+}
+

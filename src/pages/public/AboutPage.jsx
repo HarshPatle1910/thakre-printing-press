@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, Calendar } from 'lucide-react';
-import { getLocalized } from '../../utils/helpers';
+import { getLocalized, formatImageUrl } from '../../utils/helpers';
 import firestoreService from '../../services/firestoreService';
 import { COLLECTIONS } from '../../config/constants';
 import analyticsService from '../../services/analyticsService';
@@ -16,9 +16,22 @@ export default function AboutPage() {
 
   useEffect(() => {
     analyticsService.trackPageView('/about');
-    firestoreService.getDocument(COLLECTIONS.ABOUT, 'main')
-      .then((data) => { setAbout(data); setLoading(false); })
-      .catch(() => setLoading(false));
+    const unsub = firestoreService.subscribeToDocument(
+      COLLECTIONS.ABOUT,
+      'main',
+      (data) => {
+        setAbout(data);
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error loading about data:', err);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
   }, []);
 
   if (loading) return <Loader text={t('common.loading')} />;
@@ -60,10 +73,23 @@ export default function AboutPage() {
                 .map((member, i) => (
                 <div className="team-card" key={i}>
                   {member.photo ? (
-                    <img src={member.photo} alt={member.name} className="team-card__photo" />
-                  ) : (
-                    <div className="team-card__photo-placeholder"><Users size={32} /></div>
-                  )}
+                    <img
+                      src={formatImageUrl(member.photo)}
+                      alt={member.name}
+                      className="team-card__photo"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className="team-card__photo-placeholder"
+                    style={{ display: member.photo ? 'none' : 'flex' }}
+                  >
+                    <Users size={32} />
+                  </div>
                   <h3>{member.name}</h3>
                   <p className="team-card__role">{getLocalized(member.role, lang)}</p>
                   {member.biography && <p className="team-card__bio">{getLocalized(member.biography, lang)}</p>}

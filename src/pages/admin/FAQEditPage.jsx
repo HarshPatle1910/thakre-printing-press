@@ -7,7 +7,8 @@ import Loader from '../../components/common/Loader';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
-import { Save, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import { Save, ArrowLeft, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
 import './FAQEditPage.css';
 
 export default function FAQEditPage() {
@@ -27,6 +28,29 @@ export default function FAQEditPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await firestoreService.deleteDocument(COLLECTIONS.FAQS, id);
+      await activityLogService.logAction(
+        user?.uid || 'admin',
+        user?.displayName || 'Admin',
+        'DELETE_FAQ',
+        'faqs',
+        id,
+        { question: formData.question?.en || 'FAQ' }
+      );
+      navigate('/admin/faqs');
+    } catch (err) {
+      console.error('Error deleting FAQ:', err);
+      setMessage({ type: 'error', text: 'Failed to delete FAQ: ' + err.message });
+      setShowDeleteModal(false);
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!isNew) {
@@ -244,25 +268,47 @@ export default function FAQEditPage() {
           </div>
         </section>
 
-        <div className="admin-form-actions">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => navigate('/admin/faqs')}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            icon={Save}
-            loading={saving}
-          >
-            {saving ? 'Saving...' : 'Save FAQ'}
-          </Button>
+        <div className="admin-form-actions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          {!isNew && (
+            <Button
+              type="button"
+              variant="danger"
+              icon={Trash2}
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete FAQ
+            </Button>
+          )}
+          <div style={{ display: 'flex', gap: '1rem', marginLeft: isNew ? 'auto' : undefined }}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate('/admin/faqs')}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              icon={Save}
+              loading={saving}
+            >
+              {saving ? 'Saving...' : 'Save FAQ'}
+            </Button>
+          </div>
         </div>
       </form>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete FAQ"
+        message="Are you sure you want to delete this FAQ question and answer?"
+        itemName={formData.question.en}
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 }

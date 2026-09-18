@@ -8,7 +8,8 @@ import EmptyState from '../../components/common/EmptyState';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
-import { Plus, Edit, Trash2, Search, HelpCircle } from 'lucide-react';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import { Plus, Edit, Trash2, Search, HelpCircle, CheckCircle, AlertCircle } from 'lucide-react';
 import './FAQListPage.css';
 
 export default function FAQListPage() {
@@ -18,6 +19,9 @@ export default function FAQListPage() {
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [actionMessage, setActionMessage] = useState(null);
 
   useEffect(() => {
     const unsub = firestoreService.subscribeToCollection(
@@ -37,20 +41,28 @@ export default function FAQListPage() {
     return () => unsub();
   }, []);
 
-  const handleDelete = async (id, question) => {
-    if (!window.confirm(`Delete FAQ "${question?.en || question}"?`)) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await firestoreService.deleteDocument(COLLECTIONS.FAQS, id);
+      await firestoreService.deleteDocument(COLLECTIONS.FAQS, deleteTarget.id);
       await activityLogService.logAction(
         user?.uid || 'admin',
         user?.displayName || 'Admin',
         'DELETE_FAQ',
         'faqs',
-        id
+        deleteTarget.id,
+        { question: deleteTarget.question?.en || deleteTarget.question }
       );
+      setDeleteTarget(null);
+      setActionMessage({ type: 'success', text: 'FAQ deleted successfully' });
+      setTimeout(() => setActionMessage(null), 4000);
     } catch (err) {
       console.error('Error deleting FAQ:', err);
-      setFaqs((prev) => prev.filter((f) => f.id !== id));
+      setActionMessage({ type: 'error', text: 'Failed to delete FAQ: ' + err.message });
+      setDeleteTarget(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -74,6 +86,13 @@ export default function FAQListPage() {
           </Button>
         }
       />
+
+      {actionMessage && (
+        <div className={`admin-alert admin-alert--${actionMessage.type}`} style={{ marginBottom: '1.5rem' }}>
+          {actionMessage.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+          <span>{actionMessage.text}</span>
+        </div>
+      )}
 
       <div className="admin-toolbar">
         <div className="search-box">
@@ -145,7 +164,7 @@ export default function FAQListPage() {
                     </button>
                     <button
                       className="table-action-btn table-action-btn--danger"
-                      onClick={() => handleDelete(faq.id, faq.question)}
+                      onClick={() => setDeleteTarget(faq)}
                       title="Delete FAQ"
                     >
                       <Trash2 size={16} />
@@ -157,6 +176,16 @@ export default function FAQListPage() {
           </table>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTarget}
+        title="Delete FAQ"
+        message="Are you sure you want to delete this FAQ question and answer?"
+        itemName={deleteTarget?.question?.en || deleteTarget?.question || ''}
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

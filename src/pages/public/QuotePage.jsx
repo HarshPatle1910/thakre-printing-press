@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Send, Upload, Check, MessageCircle, X } from 'lucide-react';
 import { getLocalized } from '../../utils/helpers';
 import { getQuoteWhatsAppUrl } from '../../utils/whatsapp';
+import { useBusiness } from '../../contexts/BusinessContext';
 import firestoreService from '../../services/firestoreService';
 import enquiryService from '../../services/enquiryService';
 import storageService from '../../services/storageService';
@@ -13,16 +14,15 @@ import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import './QuotePage.css';
 
-import { SEED_DATA } from '../../config/seedData';
-
 export default function QuotePage() {
   const { t, i18n } = useTranslation();
+  const { business } = useBusiness();
   const lang = i18n.language;
   const [searchParams] = useSearchParams();
   const preSelectedService = searchParams.get('service') || '';
 
-  const [services, setServices] = useState(SEED_DATA.services);
-  const [loading, setLoading] = useState(false);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(null);
   const [errors, setErrors] = useState({});
@@ -31,7 +31,7 @@ export default function QuotePage() {
     customerName: '',
     phone: '',
     email: '',
-    serviceId: preSelectedService || 'flex-banner-printing',
+    serviceId: preSelectedService || '',
     quantity: '',
     requirement: '',
     additionalNotes: '',
@@ -42,23 +42,43 @@ export default function QuotePage() {
   useEffect(() => {
     analyticsService.trackQuoteFormOpened();
     analyticsService.trackPageView('/quote');
-    firestoreService.getCollection(COLLECTIONS.SERVICES, [
-      firestoreService.where('published', '==', true),
-      firestoreService.orderBy('displayOrder', 'asc'),
-    ]).then((data) => {
-      const activeServices = data && data.length > 0 ? data : SEED_DATA.services;
-      setServices(activeServices);
-      setLoading(false);
-      const targetId = preSelectedService || activeServices[0]?.id || activeServices[0]?.slug;
-      if (targetId) {
-        const svc = activeServices.find(s => s.id === targetId || s.slug === targetId);
-        if (svc?.enquiryFields) {
-          const initial = {};
-          svc.enquiryFields.forEach(f => { initial[f.name] = ''; });
-          setDynamicFields(initial);
+
+    async function loadServices() {
+      try {
+        let activeServices = [];
+        try {
+          activeServices = await firestoreService.getCollection(COLLECTIONS.SERVICES, [
+            firestoreService.where('published', '==', true),
+            firestoreService.orderBy('displayOrder', 'asc'),
+          ]);
+        } catch (queryErr) {
+          console.warn('Fallback fetching services without compound order in QuotePage:', queryErr);
+          const all = await firestoreService.getCollection(COLLECTIONS.SERVICES);
+          activeServices = (all || [])
+            .filter(s => s.published !== false)
+            .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
         }
+
+        setServices(activeServices || []);
+
+        const targetId = preSelectedService || activeServices?.[0]?.id || activeServices?.[0]?.slug || '';
+        if (targetId) {
+          setForm(prev => ({ ...prev, serviceId: targetId }));
+          const svc = activeServices?.find(s => s.id === targetId || s.slug === targetId);
+          if (svc?.enquiryFields) {
+            const initial = {};
+            svc.enquiryFields.forEach(f => { initial[f.name] = ''; });
+            setDynamicFields(initial);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load services for quote from Firebase:', err);
+      } finally {
+        setLoading(false);
       }
-    }).catch(() => setLoading(false));
+    }
+
+    loadServices();
   }, [preSelectedService]);
 
   const selectedService = services.find(s => s.id === form.serviceId);
@@ -167,7 +187,7 @@ export default function QuotePage() {
               <Button
                 variant="whatsapp"
                 icon={MessageCircle}
-                href={getQuoteWhatsAppUrl(success.enquiryId)}
+                href={getQuoteWhatsAppUrl(success.enquiryId, business?.whatsapp)}
                 target="_blank"
               >
                 {t('quote.whatsappFollowUp')}

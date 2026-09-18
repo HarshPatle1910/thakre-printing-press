@@ -28,7 +28,7 @@ const firestoreService = {
     const docRef = doc(db, collectionName, docId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      return { ...docSnap.data(), id: docSnap.id };
     }
     return null;
   },
@@ -36,25 +36,30 @@ const firestoreService = {
   async setDocument(collectionName, docId, data, merge = true) {
     const docRef = doc(db, collectionName, docId);
     await setDoc(docRef, { ...data, updatedAt: serverTimestamp() }, { merge });
-    return { id: docId, ...data };
+    return { ...data, id: docId };
   },
 
   async updateDocument(collectionName, docId, data) {
     const docRef = doc(db, collectionName, docId);
     await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
-    return { id: docId, ...data };
+    return { ...data, id: docId };
   },
 
   async deleteDocument(collectionName, docId) {
-    const docRef = doc(db, collectionName, docId);
+    if (!docId) {
+      throw new Error(`deleteDocument requires docId, received: ${docId}`);
+    }
+    const cleanId = String(docId).trim();
+    const docRef = doc(db, collectionName, cleanId);
     await deleteDoc(docRef);
+    return true;
   },
 
   // --- Collection ---
   async getCollection(collectionName, constraints = []) {
     const q = query(collection(db, collectionName), ...constraints);
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return snapshot.docs.map((d) => ({ ...d.data(), id: d.id }));
   },
 
   async addDocument(collectionName, data) {
@@ -63,7 +68,7 @@ const firestoreService = {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
-    return { id: docRef.id, ...data };
+    return { ...data, id: docRef.id };
   },
 
   // --- Real-time ---
@@ -72,7 +77,7 @@ const firestoreService = {
       doc(db, collectionName, docId),
       (docSnap) => {
         if (docSnap.exists()) {
-          callback({ id: docSnap.id, ...docSnap.data() });
+          callback({ ...docSnap.data(), id: docSnap.id });
         } else {
           callback(null);
         }
@@ -86,7 +91,7 @@ const firestoreService = {
     return onSnapshot(
       q,
       (snapshot) => {
-        const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const items = snapshot.docs.map((d) => ({ ...d.data(), id: d.id }));
         callback(items);
       },
       errorCallback

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, Search, Check, XCircle } from 'lucide-react';
-import { getLocalized } from '../../utils/helpers';
+import { getLocalized, formatImageUrl } from '../../utils/helpers';
 import firestoreService from '../../services/firestoreService';
 import { COLLECTIONS } from '../../config/constants';
 import analyticsService from '../../services/analyticsService';
@@ -9,24 +9,36 @@ import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import './FormsPage.css';
 
-import { SEED_DATA } from '../../config/seedData';
-
 export default function FormsPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const [forms, setForms] = useState(SEED_DATA.forms);
-  const [loading, setLoading] = useState(false);
+  const [forms, setForms] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
     analyticsService.trackPageView('/forms');
-    firestoreService.getCollection(COLLECTIONS.FORMS, [
-      firestoreService.where('published', '==', true),
-      firestoreService.orderBy('displayOrder', 'asc'),
-    ]).then((data) => {
-      if (data && data.length > 0) setForms(data);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+
+    // Real-time listener for live updates from Firebase
+    const unsub = firestoreService.subscribeToCollection(
+      COLLECTIONS.FORMS,
+      [],
+      (data) => {
+        const published = (data || [])
+          .filter((f) => f.published !== false)
+          .sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
+        setForms(published);
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Failed to subscribe to forms:', err);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
   }, []);
 
   const filtered = forms.filter(f => {
@@ -61,7 +73,7 @@ export default function FormsPage() {
           <div className="forms-grid">
             {filtered.map((form) => (
               <div className="form-card" key={form.id}>
-                {form.previewImage && <img src={form.previewImage} alt={getLocalized(form.name, lang)} className="form-card__image" loading="lazy" />}
+                {form.previewImage && <img src={formatImageUrl(form.previewImage)} alt={getLocalized(form.name, lang)} className="form-card__image" loading="lazy" referrerPolicy="no-referrer" />}
                 <div className="form-card__body">
                   <h3>{getLocalized(form.name, lang)}</h3>
                   {form.description && <p>{getLocalized(form.description, lang)}</p>}

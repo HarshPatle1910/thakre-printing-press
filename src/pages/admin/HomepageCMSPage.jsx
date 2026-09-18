@@ -4,7 +4,8 @@ import AdminHeader from '../../components/admin/AdminHeader';
 import Button from '../../components/common/Button';
 import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
-import { Save, CheckCircle, AlertCircle, Plus, Trash2, Home } from 'lucide-react';
+import { formatImageUrl } from '../../utils/helpers';
+import { Save, CheckCircle, AlertCircle, Plus, Trash2, Home, Image as ImageIcon } from 'lucide-react';
 import './HomepageCMSPage.css';
 
 export default function HomepageCMSPage() {
@@ -257,10 +258,43 @@ export default function HomepageCMSPage() {
             <input
               type="url"
               className="form-input"
-              placeholder="https://images.unsplash.com/..."
+              placeholder="https://images.unsplash.com/... or Google Drive share link"
               value={homepageData.hero.image || ''}
               onChange={(e) => handleHeroChange('image', null, e.target.value)}
             />
+            <p style={{ marginTop: '0.35rem', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+              Supports direct image links, Firebase Storage, and Google Drive links (make sure sharing is set to &ldquo;Anyone with the link can view&rdquo;).
+            </p>
+
+            {homepageData.hero.image && (
+              <div style={{ marginTop: '0.75rem', maxWidth: '380px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                  <ImageIcon size={14} />
+                  <span>Image Preview</span>
+                </div>
+                <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)', background: 'var(--color-bg-secondary)', minHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img
+                    src={formatImageUrl(homepageData.hero.image)}
+                    alt="Hero banner preview"
+                    referrerPolicy="no-referrer"
+                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', display: 'block' }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const errEl = e.currentTarget.nextElementSibling;
+                      if (errEl) errEl.style.display = 'block';
+                    }}
+                    onLoad={(e) => {
+                      e.currentTarget.style.display = 'block';
+                      const errEl = e.currentTarget.nextElementSibling;
+                      if (errEl) errEl.style.display = 'none';
+                    }}
+                  />
+                  <div style={{ display: 'none', padding: '1rem', color: 'var(--color-danger)', fontSize: '0.825rem', textAlign: 'center' }}>
+                    ⚠️ Unable to load image preview. If using Google Drive, please ensure link access is set to <strong>&ldquo;Anyone with the link can view&rdquo;</strong>.
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
