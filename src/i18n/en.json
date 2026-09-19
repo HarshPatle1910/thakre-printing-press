@@ -22,6 +22,8 @@
     "services": {
       "title": "Our Services",
       "subtitle": "Comprehensive printing and document solutions for individuals, businesses, and organizations",
+      "search": "Search services (e.g. banners, cards, stamps)...",
+      "noServices": "No services found",
       "viewAll": "View All Services",
       "viewDetails": "View Details",
       "enquire": "Enquire Now",
@@ -32,6 +34,7 @@
     "gallery": {
       "title": "Our Work",
       "subtitle": "Browse through samples of our printing and design work",
+      "search": "Search portfolio & designs...",
       "all": "All",
       "noItems": "No gallery items found",
       "placeholder": "Sample / Placeholder Image"
@@ -39,7 +42,7 @@
     "forms": {
       "title": "Available Forms",
       "subtitle": "We provide a wide range of printed forms for various purposes",
-      "search": "Search forms...",
+      "search": "Search forms (e.g. 7/12, affidavit, stamp)...",
       "available": "Available",
       "unavailable": "Currently Unavailable",
       "noForms": "No forms found",
@@ -111,6 +114,7 @@
       "edit": "Edit",
       "create": "Create",
       "search": "Search...",
+      "clearSearch": "Clear search",
       "noResults": "No results found",
       "viewMore": "View More",
       "call": "Call",

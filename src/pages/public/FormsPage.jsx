@@ -7,6 +7,8 @@ import { COLLECTIONS } from '../../config/constants';
 import analyticsService from '../../services/analyticsService';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import SearchBar from '../../components/common/SearchBar';
+import Button from '../../components/common/Button';
 import './FormsPage.css';
 
 export default function FormsPage() {
@@ -41,12 +43,26 @@ export default function FormsPage() {
     };
   }, []);
 
-  const filtered = forms.filter(f => {
-    if (!search) return true;
-    const name = getLocalized(f.name, lang).toLowerCase();
-    const desc = getLocalized(f.description, lang).toLowerCase();
+  const filtered = forms.filter((f) => {
+    if (!search.trim()) return true;
     const q = search.toLowerCase();
-    return name.includes(q) || desc.includes(q);
+    const nameEn = (f.name?.en || '').toLowerCase();
+    const nameMr = (f.name?.mr || '').toLowerCase();
+    const nameHi = (f.name?.hi || '').toLowerCase();
+    const descEn = (f.description?.en || '').toLowerCase();
+    const descMr = (f.description?.mr || '').toLowerCase();
+    const localizedName = getLocalized(f.name, lang).toLowerCase();
+    const localizedDesc = getLocalized(f.description, lang).toLowerCase();
+
+    return (
+      nameEn.includes(q) ||
+      nameMr.includes(q) ||
+      nameHi.includes(q) ||
+      descEn.includes(q) ||
+      descMr.includes(q) ||
+      localizedName.includes(q) ||
+      localizedDesc.includes(q)
+    );
   });
 
   if (loading) return <Loader text={t('common.loading')} />;
@@ -61,14 +77,34 @@ export default function FormsPage() {
         </div>
 
         {forms.length > 0 && (
-          <div className="forms-search">
-            <Search size={18} />
-            <input type="text" placeholder={t('forms.search')} value={search} onChange={(e) => setSearch(e.target.value)} className="form-input" />
-          </div>
+          <SearchBar
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch('')}
+            placeholder={t('forms.search')}
+            ariaLabel={t('forms.search')}
+            count={search.trim() ? filtered.length : undefined}
+            id="forms-search"
+          />
         )}
 
         {filtered.length === 0 ? (
-          <EmptyState icon={FileText} title={t('forms.noForms')} />
+          <EmptyState
+            icon={FileText}
+            title={t('forms.noForms')}
+            message={
+              search
+                ? `No official forms found matching "${search}". Try searching by department or keyword.`
+                : "Official forms will appear here once added to the catalog."
+            }
+            action={
+              search ? (
+                <Button variant="outline" size="sm" onClick={() => setSearch('')}>
+                  {t('common.clearSearch')}
+                </Button>
+              ) : null
+            }
+          />
         ) : (
           <div className="forms-grid">
             {filtered.map((form) => (

@@ -1,0 +1,128 @@
+/* ============================================
+   SearchBar Component — Modern & Accessible
+   ============================================ */
+
+.search-bar {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto var(--space-8);
+  position: relative;
+}
+
+.search-bar__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--color-surface-card, #FFFFFF);
+  border: 1.5px solid var(--color-border, #E0DCD5);
+  border-radius: var(--radius-full, 9999px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.search-bar__inner:hover {
+  border-color: var(--color-primary-light, #2D6A4F);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.search-bar__inner:focus-within {
+  border-color: var(--color-primary, #1B4332);
+  box-shadow: 0 0 0 3.5px var(--color-primary-50, #E8F5E9), 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.search-bar__icon {
+  position: absolute;
+  left: var(--space-4, 16px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-primary-light, #2D6A4F);
+  pointer-events: none;
+  transition: color var(--transition-fast, 0.15s ease);
+  flex-shrink: 0;
+}
+
+.search-bar__inner:focus-within .search-bar__icon {
+  color: var(--color-primary, #1B4332);
+}
+
+.search-bar__input {
+  width: 100%;
+  height: 48px;
+  padding: 0 3.25rem 0 3rem;
+  font-size: var(--font-size-base, 1rem);
+  font-family: var(--font-family);
+  color: var(--color-text, #1A1A1A);
+  background: transparent;
+  border: none;
+  outline: none;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.search-bar__input::placeholder {
+  color: var(--color-text-tertiary, #8A8A8A);
+  font-weight: var(--font-weight-normal, 400);
+}
+
+.search-bar__actions {
+  position: absolute;
+  right: var(--space-3, 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+
+.search-bar__count-badge {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-semibold, 600);
+  padding: 2px 8px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-primary-50, #E8F5E9);
+  color: var(--color-primary, #1B4332);
+  border: 1px solid var(--color-primary-100, #C8E6C9);
+  user-select: none;
+}
+
+.search-bar__clear-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-surface-alt, #FAF5EC);
+  color: var(--color-text-secondary, #5C5C5C);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.search-bar__clear-btn:hover {
+  background: var(--color-error-bg, #FFF0F0);
+  color: var(--color-error, #D62828);
+  transform: scale(1.06);
+}
+
+.search-bar__clear-btn:active {
+  transform: scale(0.95);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .search-bar {
+    max-width: 100%;
+    margin-bottom: var(--space-6, 24px);
+  }
+
+  .search-bar__input {
+    height: 44px;
+    font-size: var(--font-size-sm, 0.875rem);
+    padding: 0 2.85rem 0 2.75rem;
+  }
+
+  .search-bar__icon {
+    left: var(--space-3, 12px);
+  }
+}

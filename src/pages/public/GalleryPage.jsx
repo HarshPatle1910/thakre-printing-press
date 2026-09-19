@@ -7,6 +7,8 @@ import { COLLECTIONS } from '../../config/constants';
 import analyticsService from '../../services/analyticsService';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import SearchBar from '../../components/common/SearchBar';
+import Button from '../../components/common/Button';
 import './GalleryPage.css';
 
 const CATEGORY_FALLBACK_NAMES = {
@@ -27,6 +29,7 @@ export default function GalleryPage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [lightboxItem, setLightboxItem] = useState(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     analyticsService.trackPageView('/gallery');
@@ -98,7 +101,32 @@ export default function GalleryPage() {
     return CATEGORY_FALLBACK_NAMES[catSlug] || catSlug.replace(/-/g, ' ');
   };
 
-  const filtered = activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory);
+  const filtered = items.filter((item) => {
+    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+    if (!matchesCategory) return false;
+    if (!search.trim()) return true;
+
+    const q = search.toLowerCase();
+    const titleEn = (item.title?.en || '').toLowerCase();
+    const titleMr = (item.title?.mr || '').toLowerCase();
+    const titleHi = (item.title?.hi || '').toLowerCase();
+    const descEn = (item.description?.en || '').toLowerCase();
+    const descMr = (item.description?.mr || '').toLowerCase();
+    const catTitle = (getCategoryTitle(item.category) || '').toLowerCase();
+    const localizedTitle = (getLocalized(item.title, lang) || '').toLowerCase();
+    const localizedDesc = (getLocalized(item.description, lang) || '').toLowerCase();
+
+    return (
+      titleEn.includes(q) ||
+      titleMr.includes(q) ||
+      titleHi.includes(q) ||
+      descEn.includes(q) ||
+      descMr.includes(q) ||
+      catTitle.includes(q) ||
+      localizedTitle.includes(q) ||
+      localizedDesc.includes(q)
+    );
+  });
 
   if (loading) return <Loader text={t('common.loading')} />;
 
@@ -110,6 +138,18 @@ export default function GalleryPage() {
           <h1>{t('gallery.title')}</h1>
           <p>{t('gallery.subtitle')}</p>
         </div>
+
+        {items.length > 0 && (
+          <SearchBar
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch('')}
+            placeholder={t('gallery.search')}
+            ariaLabel={t('gallery.search')}
+            count={search.trim() ? filtered.length : undefined}
+            id="gallery-search"
+          />
+        )}
 
         {/* Category filters */}
         {categories.length > 0 && (
@@ -133,7 +173,22 @@ export default function GalleryPage() {
         )}
 
         {filtered.length === 0 ? (
-          <EmptyState icon={Image} title={t('gallery.noItems')} />
+          <EmptyState
+            icon={Image}
+            title={t('gallery.noItems')}
+            message={
+              search
+                ? `No gallery items found matching "${search}". Try adjusting your keywords or selected category.`
+                : "No items found in this category."
+            }
+            action={
+              search ? (
+                <Button variant="outline" size="sm" onClick={() => setSearch('')}>
+                  {t('common.clearSearch')}
+                </Button>
+              ) : null
+            }
+          />
         ) : (
           <div className="gallery-grid">
             {filtered.map((item) => {

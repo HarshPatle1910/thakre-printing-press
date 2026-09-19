@@ -8,6 +8,8 @@ import { COLLECTIONS } from '../../config/constants';
 import analyticsService from '../../services/analyticsService';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import SearchBar from '../../components/common/SearchBar';
+import Button from '../../components/common/Button';
 import './ServicesPage.css';
 
 export default function ServicesPage() {
@@ -15,6 +17,7 @@ export default function ServicesPage() {
   const lang = i18n.language;
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     analyticsService.trackPageView('/services');
@@ -42,6 +45,28 @@ export default function ServicesPage() {
     });
   }, []);
 
+  const filteredServices = services.filter((s) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    const titleEn = (s.title?.en || '').toLowerCase();
+    const titleMr = (s.title?.mr || '').toLowerCase();
+    const titleHi = (s.title?.hi || '').toLowerCase();
+    const descEn = (s.shortDescription?.en || s.description?.en || '').toLowerCase();
+    const descMr = (s.shortDescription?.mr || s.description?.mr || '').toLowerCase();
+    const localizedTitle = getLocalized(s.title, lang).toLowerCase();
+    const localizedDesc = getLocalized(s.shortDescription || s.description, lang).toLowerCase();
+
+    return (
+      titleEn.includes(q) ||
+      titleMr.includes(q) ||
+      titleHi.includes(q) ||
+      descEn.includes(q) ||
+      descMr.includes(q) ||
+      localizedTitle.includes(q) ||
+      localizedDesc.includes(q)
+    );
+  });
+
   if (loading) return <Loader text={t('common.loading')} />;
 
   return (
@@ -53,11 +78,38 @@ export default function ServicesPage() {
           <p>{t('services.subtitle')}</p>
         </div>
 
-        {services.length === 0 ? (
-          <EmptyState icon={Printer} title="No services yet" message="Services will appear here once added." />
+        {services.length > 0 && (
+          <SearchBar
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch('')}
+            placeholder={t('services.search')}
+            ariaLabel={t('services.search')}
+            count={search.trim() ? filteredServices.length : undefined}
+            id="services-search"
+          />
+        )}
+
+        {filteredServices.length === 0 ? (
+          <EmptyState
+            icon={Printer}
+            title={search ? t('services.noServices') : "No services yet"}
+            message={
+              search
+                ? `No services found matching "${search}". Try searching for another printing service or product.`
+                : "Services will appear here once added."
+            }
+            action={
+              search ? (
+                <Button variant="outline" size="sm" onClick={() => setSearch('')}>
+                  {t('common.clearSearch')}
+                </Button>
+              ) : null
+            }
+          />
         ) : (
           <div className="services-grid">
-            {services.map((service, i) => (
+            {filteredServices.map((service, i) => (
               <Link to={`/services/${service.slug}`} className="service-card" key={service.id} style={{ animationDelay: `${i * 0.05}s` }}>
                 {service.heroImage && (
                   <div className="service-card__image">

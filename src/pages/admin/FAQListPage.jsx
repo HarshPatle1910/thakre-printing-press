@@ -9,7 +9,7 @@ import firestoreService from '../../services/firestoreService';
 import activityLogService from '../../services/activityLogService';
 import { COLLECTIONS } from '../../config/constants';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import { Plus, Edit, Trash2, Search, HelpCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, HelpCircle, CheckCircle, AlertCircle } from 'lucide-react';
 import './FAQListPage.css';
 
 export default function FAQListPage() {
@@ -104,6 +104,17 @@ export default function FAQListPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          {search && (
+            <button
+              type="button"
+              className="search-clear-btn"
+              onClick={() => setSearch('')}
+              title="Clear search"
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
 
