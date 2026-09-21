@@ -17,6 +17,7 @@ const activityLogService = {
         resource,
         resourceId,
         metadata,
+        timestamp: firestoreService.serverTimestamp(),
       });
     } catch (err) {
       console.warn('Activity log write error (non-blocking):', err);
