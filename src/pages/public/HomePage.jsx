@@ -162,11 +162,12 @@ export default function HomePage() {
                 {t('hero.whatsapp')}
               </Button>
               <Button
-                variant="outline"
+                variant="outline-light"
                 size="lg"
                 icon={Phone}
                 href={getPhoneUrl(business.phone)}
                 onClick={() => analyticsService.trackPhoneClick()}
+                className="hero__btn-call"
               >
                 {t('hero.callUs')}
               </Button>

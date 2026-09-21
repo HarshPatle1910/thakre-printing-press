@@ -77,6 +77,26 @@
   color: var(--color-text-on-primary);
 }
 
+.btn--outline-light {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.btn--outline-light:hover:not(:disabled) {
+  background: #FFFFFF;
+  color: var(--color-primary-dark);
+  border-color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn--outline-light:active:not(:disabled) {
+  transform: translateY(0);
+}
+
 .btn--ghost {
   background: transparent;
   color: var(--color-text-secondary);

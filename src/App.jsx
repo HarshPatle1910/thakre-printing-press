@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import SplashScreen from './components/common/SplashScreen';
 
 // Layouts & Guards
 import PublicLayout from './components/public/PublicLayout';
@@ -44,7 +46,24 @@ import UsersPage from './pages/admin/UsersPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage';
 import SettingsPage from './pages/admin/SettingsPage';
 
+/** Show splash only on the very first visit per browser session */
+const hasSeenSplash = sessionStorage.getItem('tpp_splash_seen');
+
 export default function App() {
+  const [splashDone, setSplashDone] = useState(!!hasSeenSplash);
+
+  function handleSplashDone() {
+    sessionStorage.setItem('tpp_splash_seen', '1');
+    setSplashDone(true);
+  }
+
+  // Don't skip splash for admin routes — they go straight in without it
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+
+  if (!splashDone && !isAdminRoute) {
+    return <SplashScreen onDone={handleSplashDone} />;
+  }
+
   return (
     <Routes>
       {/* Public Routes */}

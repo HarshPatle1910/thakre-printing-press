@@ -67,8 +67,53 @@
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-3);
   margin-bottom: var(--space-8);
+}
+
+/* Call Us & outline action buttons in hero (high-contrast frosted glass style) */
+.hero__actions .btn--outline,
+.hero__actions .btn--outline-light,
+.hero__btn-call {
+  background: rgba(255, 255, 255, 0.14);
+  color: #FFFFFF !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.hero__actions .btn--outline .btn__icon,
+.hero__actions .btn--outline-light .btn__icon,
+.hero__btn-call .btn__icon {
+  color: #FFFFFF !important;
+  transition: transform var(--transition-fast);
+}
+
+.hero__actions .btn--outline:hover:not(:disabled),
+.hero__actions .btn--outline-light:hover:not(:disabled),
+.hero__btn-call:hover:not(:disabled) {
+  background: #FFFFFF !important;
+  color: var(--color-primary-dark) !important;
+  border-color: #FFFFFF !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
+  transform: translateY(-2px);
+}
+
+.hero__actions .btn--outline:hover:not(:disabled) .btn__icon,
+.hero__actions .btn--outline-light:hover:not(:disabled) .btn__icon,
+.hero__btn-call:hover:not(:disabled) .btn__icon {
+  color: var(--color-primary-dark) !important;
+  transform: rotate(-12deg) scale(1.12);
+}
+
+.hero__actions .btn--outline:active:not(:disabled),
+.hero__actions .btn--outline-light:active:not(:disabled),
+.hero__btn-call:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .hero__info {
@@ -209,6 +254,11 @@
 
   .hero__actions {
     flex-direction: column;
+    width: 100%;
+  }
+
+  .hero__actions .btn {
+    width: 100%;
   }
 
   .hero__info {
