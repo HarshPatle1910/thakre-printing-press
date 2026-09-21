@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Send, Upload, Check, MessageCircle, X } from 'lucide-react';
+import { Send, Check, MessageCircle } from 'lucide-react';
 import { getLocalized } from '../../utils/helpers';
 import { getQuoteWhatsAppUrl } from '../../utils/whatsapp';
 import { useBusiness } from '../../contexts/BusinessContext';
 import firestoreService from '../../services/firestoreService';
 import enquiryService from '../../services/enquiryService';
-import storageService from '../../services/storageService';
 import analyticsService from '../../services/analyticsService';
 import { COLLECTIONS } from '../../config/constants';
 import Button from '../../components/common/Button';
@@ -37,7 +36,6 @@ export default function QuotePage() {
     additionalNotes: '',
   });
   const [dynamicFields, setDynamicFields] = useState({});
-  const [files, setFiles] = useState([]);
 
   useEffect(() => {
     analyticsService.trackQuoteFormOpened();
@@ -55,7 +53,7 @@ export default function QuotePage() {
           console.warn('Fallback fetching services without compound order in QuotePage:', queryErr);
           const all = await firestoreService.getCollection(COLLECTIONS.SERVICES);
           activeServices = (all || [])
-            .filter(s => s.published !== false)
+            .filter((s) => s.published !== false)
             .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
         }
 
@@ -63,11 +61,11 @@ export default function QuotePage() {
 
         const targetId = preSelectedService || activeServices?.[0]?.id || activeServices?.[0]?.slug || '';
         if (targetId) {
-          setForm(prev => ({ ...prev, serviceId: targetId }));
-          const svc = activeServices?.find(s => s.id === targetId || s.slug === targetId);
+          setForm((prev) => ({ ...prev, serviceId: targetId }));
+          const svc = activeServices?.find((s) => s.id === targetId || s.slug === targetId);
           if (svc?.enquiryFields) {
             const initial = {};
-            svc.enquiryFields.forEach(f => { initial[f.name] = ''; });
+            svc.enquiryFields.forEach((f) => { initial[f.name] = ''; });
             setDynamicFields(initial);
           }
         }
@@ -81,37 +79,18 @@ export default function QuotePage() {
     loadServices();
   }, [preSelectedService]);
 
-  const selectedService = services.find(s => s.id === form.serviceId);
+  const selectedService = services.find((s) => s.id === form.serviceId || s.slug === form.serviceId);
 
   const handleServiceChange = (serviceId) => {
-    setForm(prev => ({ ...prev, serviceId }));
-    const svc = services.find(s => s.id === serviceId);
+    setForm((prev) => ({ ...prev, serviceId }));
+    const svc = services.find((s) => s.id === serviceId || s.slug === serviceId);
     if (svc?.enquiryFields) {
       const initial = {};
-      svc.enquiryFields.forEach(f => { initial[f.name] = ''; });
+      svc.enquiryFields.forEach((f) => { initial[f.name] = ''; });
       setDynamicFields(initial);
     } else {
       setDynamicFields({});
     }
-  };
-
-  const handleFileAdd = (e) => {
-    const newFiles = Array.from(e.target.files);
-    const validFiles = [];
-    for (const file of newFiles) {
-      const validation = storageService.validateFile(file);
-      if (!validation.valid) {
-        setErrors(prev => ({ ...prev, files: validation.error }));
-        return;
-      }
-      validFiles.push(file);
-    }
-    setFiles(prev => [...prev, ...validFiles]);
-    setErrors(prev => ({ ...prev, files: null }));
-  };
-
-  const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const validate = () => {
@@ -125,7 +104,7 @@ export default function QuotePage() {
 
     // Validate required dynamic fields
     if (selectedService?.enquiryFields) {
-      selectedService.enquiryFields.forEach(field => {
+      selectedService.enquiryFields.forEach((field) => {
         if (field.required && !dynamicFields[field.name]?.trim()) {
           newErrors[`dynamic_${field.name}`] = `${getLocalized(field.label, lang)} is required`;
         }
@@ -142,19 +121,11 @@ export default function QuotePage() {
 
     setSubmitting(true);
     try {
-      // Upload files
-      let uploadedFiles = [];
-      if (files.length > 0) {
-        uploadedFiles = await storageService.uploadFiles(files, 'enquiries/temp');
-        analyticsService.trackFileUpload();
-      }
-
-      // Submit enquiry
+      // Submit enquiry without file upload
       const result = await enquiryService.submitEnquiry({
         ...form,
         serviceName: selectedService ? getLocalized(selectedService.title, lang) : '',
         dynamicFields,
-        files: uploadedFiles,
       });
 
       analyticsService.trackQuoteFormSubmitted();
@@ -192,7 +163,22 @@ export default function QuotePage() {
               >
                 {t('quote.whatsappFollowUp')}
               </Button>
-              <Button variant="outline" onClick={() => { setSuccess(null); setForm({ customerName: '', phone: '', email: '', serviceId: '', quantity: '', requirement: '', additionalNotes: '' }); setDynamicFields({}); setFiles([]); }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSuccess(null);
+                  setForm({
+                    customerName: '',
+                    phone: '',
+                    email: '',
+                    serviceId: '',
+                    quantity: '',
+                    requirement: '',
+                    additionalNotes: '',
+                  });
+                  setDynamicFields({});
+                }}
+              >
                 {t('quote.submitAnother')}
               </Button>
             </div>
@@ -216,31 +202,55 @@ export default function QuotePage() {
             {/* Name */}
             <div className="form-group">
               <label className="form-label">{t('quote.name')} <span className="required">*</span></label>
-              <input type="text" className={`form-input ${errors.customerName ? 'form-input--error' : ''}`} value={form.customerName} onChange={(e) => setForm(prev => ({ ...prev, customerName: e.target.value }))} />
+              <input
+                type="text"
+                className={`form-input ${errors.customerName ? 'form-input--error' : ''}`}
+                value={form.customerName}
+                onChange={(e) => setForm((prev) => ({ ...prev, customerName: e.target.value }))}
+                placeholder="Your full name"
+              />
               {errors.customerName && <div className="form-error">{errors.customerName}</div>}
             </div>
 
             {/* Phone */}
             <div className="form-group">
               <label className="form-label">{t('quote.mobile')} <span className="required">*</span></label>
-              <input type="tel" className={`form-input ${errors.phone ? 'form-input--error' : ''}`} value={form.phone} onChange={(e) => setForm(prev => ({ ...prev, phone: e.target.value }))} />
+              <input
+                type="tel"
+                className={`form-input ${errors.phone ? 'form-input--error' : ''}`}
+                value={form.phone}
+                onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
+                placeholder="10-digit mobile number"
+              />
               {errors.phone && <div className="form-error">{errors.phone}</div>}
             </div>
 
             {/* Email */}
             <div className="form-group">
               <label className="form-label">{t('quote.email')} <span className="form-hint">({t('quote.optional')})</span></label>
-              <input type="email" className={`form-input ${errors.email ? 'form-input--error' : ''}`} value={form.email} onChange={(e) => setForm(prev => ({ ...prev, email: e.target.value }))} />
+              <input
+                type="email"
+                className={`form-input ${errors.email ? 'form-input--error' : ''}`}
+                value={form.email}
+                onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                placeholder="email@example.com"
+              />
               {errors.email && <div className="form-error">{errors.email}</div>}
             </div>
 
             {/* Service */}
             <div className="form-group">
               <label className="form-label">{t('quote.service')} <span className="required">*</span></label>
-              <select className={`form-select ${errors.serviceId ? 'form-input--error' : ''}`} value={form.serviceId} onChange={(e) => handleServiceChange(e.target.value)}>
+              <select
+                className={`form-select ${errors.serviceId ? 'form-input--error' : ''}`}
+                value={form.serviceId}
+                onChange={(e) => handleServiceChange(e.target.value)}
+              >
                 <option value="">{t('quote.selectService')}</option>
-                {services.map(s => (
-                  <option key={s.id} value={s.id}>{getLocalized(s.title, lang)}</option>
+                {services.map((s) => (
+                  <option key={s.id || s.slug} value={s.id || s.slug}>
+                    {getLocalized(s.title, lang)}
+                  </option>
                 ))}
               </select>
               {errors.serviceId && <div className="form-error">{errors.serviceId}</div>}
@@ -249,7 +259,14 @@ export default function QuotePage() {
             {/* Quantity */}
             <div className="form-group">
               <label className="form-label">{t('quote.quantity')}</label>
-              <input type="number" className="form-input" min="1" value={form.quantity} onChange={(e) => setForm(prev => ({ ...prev, quantity: e.target.value }))} />
+              <input
+                type="number"
+                className="form-input"
+                min="1"
+                value={form.quantity}
+                onChange={(e) => setForm((prev) => ({ ...prev, quantity: e.target.value }))}
+                placeholder="e.g. 500, 1000"
+              />
             </div>
           </div>
 
@@ -267,14 +284,29 @@ export default function QuotePage() {
                       {field.required && <span className="required">*</span>}
                     </label>
                     {field.type === 'select' ? (
-                      <select className={`form-select ${errors[`dynamic_${field.name}`] ? 'form-input--error' : ''}`} value={dynamicFields[field.name] || ''} onChange={(e) => setDynamicFields(prev => ({ ...prev, [field.name]: e.target.value }))}>
+                      <select
+                        className={`form-select ${errors[`dynamic_${field.name}`] ? 'form-input--error' : ''}`}
+                        value={dynamicFields[field.name] || ''}
+                        onChange={(e) => setDynamicFields((prev) => ({ ...prev, [field.name]: e.target.value }))}
+                      >
                         <option value="">Select...</option>
-                        {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                        {field.options?.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
                       </select>
                     ) : field.type === 'textarea' ? (
-                      <textarea className={`form-textarea ${errors[`dynamic_${field.name}`] ? 'form-textarea--error' : ''}`} value={dynamicFields[field.name] || ''} onChange={(e) => setDynamicFields(prev => ({ ...prev, [field.name]: e.target.value }))} />
+                      <textarea
+                        className={`form-textarea ${errors[`dynamic_${field.name}`] ? 'form-textarea--error' : ''}`}
+                        value={dynamicFields[field.name] || ''}
+                        onChange={(e) => setDynamicFields((prev) => ({ ...prev, [field.name]: e.target.value }))}
+                      />
                     ) : (
-                      <input type={field.type || 'text'} className={`form-input ${errors[`dynamic_${field.name}`] ? 'form-input--error' : ''}`} value={dynamicFields[field.name] || ''} onChange={(e) => setDynamicFields(prev => ({ ...prev, [field.name]: e.target.value }))} />
+                      <input
+                        type={field.type || 'text'}
+                        className={`form-input ${errors[`dynamic_${field.name}`] ? 'form-input--error' : ''}`}
+                        value={dynamicFields[field.name] || ''}
+                        onChange={(e) => setDynamicFields((prev) => ({ ...prev, [field.name]: e.target.value }))}
+                      />
                     )}
                     {errors[`dynamic_${field.name}`] && <div className="form-error">{errors[`dynamic_${field.name}`]}</div>}
                   </div>
@@ -286,41 +318,26 @@ export default function QuotePage() {
           {/* Requirement */}
           <div className="form-group">
             <label className="form-label">{t('quote.requirement')} <span className="required">*</span></label>
-            <textarea className={`form-textarea ${errors.requirement ? 'form-textarea--error' : ''}`} value={form.requirement} onChange={(e) => setForm(prev => ({ ...prev, requirement: e.target.value }))} />
+            <textarea
+              className={`form-textarea ${errors.requirement ? 'form-textarea--error' : ''}`}
+              value={form.requirement}
+              onChange={(e) => setForm((prev) => ({ ...prev, requirement: e.target.value }))}
+              placeholder="Describe your printing specifications, size, paper type, finish, or any other details..."
+              rows={4}
+            />
             {errors.requirement && <div className="form-error">{errors.requirement}</div>}
           </div>
 
           {/* Additional notes */}
           <div className="form-group">
             <label className="form-label">{t('quote.additionalNotes')} <span className="form-hint">({t('quote.optional')})</span></label>
-            <textarea className="form-textarea" value={form.additionalNotes} onChange={(e) => setForm(prev => ({ ...prev, additionalNotes: e.target.value }))} />
-          </div>
-
-          {/* File upload */}
-          <div className="form-group">
-            <label className="form-label">{t('quote.uploadFiles')}</label>
-            <div className="file-upload-zone">
-              <input type="file" id="fileUpload" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onChange={handleFileAdd} className="file-upload-input" />
-              <label htmlFor="fileUpload" className="file-upload-label">
-                <Upload size={24} />
-                <span>Choose files or drag and drop</span>
-                <small>{t('quote.uploadHint')}</small>
-              </label>
-            </div>
-            {files.length > 0 && (
-              <div className="file-list">
-                {files.map((file, i) => (
-                  <div className="file-item" key={i}>
-                    <span className="file-item__name">{file.name}</span>
-                    <span className="file-item__size">{(file.size / 1024).toFixed(0)} KB</span>
-                    <button type="button" className="file-item__remove" onClick={() => removeFile(i)} aria-label="Remove file">
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            {errors.files && <div className="form-error">{errors.files}</div>}
+            <textarea
+              className="form-textarea"
+              value={form.additionalNotes}
+              onChange={(e) => setForm((prev) => ({ ...prev, additionalNotes: e.target.value }))}
+              placeholder="Any deadlines, delivery preferences, or additional instructions..."
+              rows={3}
+            />
           </div>
 
           {errors.submit && <div className="form-error" style={{ marginBottom: 'var(--space-4)' }}>{errors.submit}</div>}
