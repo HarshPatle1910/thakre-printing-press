@@ -34,8 +34,9 @@ export function getServiceWhatsAppUrl(serviceName, number = null) {
 /**
  * Generate WhatsApp URL for quote follow-up
  */
-export function getQuoteWhatsAppUrl(enquiryId, number = null) {
-  const message = `Hi, I submitted an enquiry (ID: ${enquiryId}). I'd like to follow up.`;
+export function getQuoteWhatsAppUrl(enquiryId, number = null, summary = '') {
+  const detail = summary ? ` for: ${summary}` : '';
+  const message = `Hi, I submitted an enquiry (ID: ${enquiryId}${detail}). I would like to get a quote and discuss the details.`;
   return getWhatsAppUrl(message, number);
 }
 

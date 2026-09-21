@@ -186,25 +186,88 @@ export default function EnquiryDetailPage() {
               )}
             </div>
 
-            {enquiry.requirement && (
-              <div className="requirement-box">
-                <span className="info-label">Customer Notes & Instructions</span>
-                <p className="requirement-text">{enquiry.requirement}</p>
-              </div>
-            )}
+            {/* Multi-Service Items Breakdown */}
+            {enquiry.items && enquiry.items.length > 0 ? (
+              <div className="enquiry-items-breakdown" style={{ marginTop: 'var(--space-6)' }}>
+                <span className="info-label" style={{ display: 'block', marginBottom: 'var(--space-3)', fontWeight: 'bold' }}>
+                  Requested Services & Requirements ({enquiry.items.length})
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  {enquiry.items.map((item, idx) => (
+                    <div
+                      key={item.id || idx}
+                      style={{
+                        background: 'var(--color-surface-alt, #f8f9fa)',
+                        border: '1px solid var(--color-border, #e9ecef)',
+                        borderRadius: 'var(--radius-lg, 8px)',
+                        padding: 'var(--space-4, 16px)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <strong style={{ fontSize: '15px', color: 'var(--color-text)' }}>
+                          #{idx + 1} {item.serviceName || item.serviceId || 'Service'}
+                        </strong>
+                        {item.quantity && (
+                          <span style={{ fontSize: '13px', background: 'var(--color-primary-50, #e8f5e9)', color: 'var(--color-primary, #2d6a4f)', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>
+                            Qty: {item.quantity}
+                          </span>
+                        )}
+                      </div>
 
-            {/* Dynamic Fields */}
-            {enquiry.dynamicFields && Object.keys(enquiry.dynamicFields).length > 0 && (
-              <div className="dynamic-specs-box">
-                <span className="info-label">Job Specifications</span>
-                <div className="specs-grid">
-                  {Object.entries(enquiry.dynamicFields).map(([k, v]) => (
-                    <div key={k} className="spec-item">
-                      <span className="spec-key">{k}:</span>
-                      <span className="spec-val">{String(v)}</span>
+                      {item.requirement && (
+                        <p style={{ margin: '6px 0 0', fontSize: '14px', color: 'var(--color-text-secondary)', whiteSpace: 'pre-wrap' }}>
+                          {item.requirement}
+                        </p>
+                      )}
+
+                      {item.dynamicFields && Object.keys(item.dynamicFields).length > 0 && (
+                        <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed var(--color-border-light, #ddd)' }}>
+                          <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>
+                            Specifications:
+                          </span>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '6px', fontSize: '12px' }}>
+                            {Object.entries(item.dynamicFields).map(([k, v]) => (
+                              <div key={k}>
+                                <strong style={{ color: 'var(--color-text-secondary)' }}>{k}:</strong> {String(v)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
+              </div>
+            ) : (
+              <>
+                {enquiry.requirement && (
+                  <div className="requirement-box">
+                    <span className="info-label">Customer Notes & Instructions</span>
+                    <p className="requirement-text">{enquiry.requirement}</p>
+                  </div>
+                )}
+
+                {/* Dynamic Fields */}
+                {enquiry.dynamicFields && Object.keys(enquiry.dynamicFields).length > 0 && (
+                  <div className="dynamic-specs-box">
+                    <span className="info-label">Job Specifications</span>
+                    <div className="specs-grid">
+                      {Object.entries(enquiry.dynamicFields).map(([k, v]) => (
+                        <div key={k} className="spec-item">
+                          <span className="spec-key">{k}:</span>
+                          <span className="spec-val">{String(v)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {enquiry.additionalNotes && (
+              <div className="requirement-box" style={{ marginTop: 'var(--space-4)' }}>
+                <span className="info-label">General Additional Notes</span>
+                <p className="requirement-text">{enquiry.additionalNotes}</p>
               </div>
             )}
 

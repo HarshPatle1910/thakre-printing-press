@@ -27,22 +27,48 @@ const enquiryService = {
   },
 
   /**
-   * Submit a new enquiry
+   * Submit a new enquiry (supports single or multiple services/requirements)
    */
   async submitEnquiry(data) {
     const enquiryId = await this.generateEnquiryId();
+
+    const items = Array.isArray(data.items) && data.items.length > 0
+      ? data.items
+      : [{
+          serviceId: data.serviceId || '',
+          serviceName: data.serviceName || '',
+          quantity: data.quantity || null,
+          requirement: data.requirement || '',
+          dynamicFields: data.dynamicFields || {},
+        }];
+
+    // Generate combined service names
+    const serviceNames = items
+      .map((it) => it.serviceName)
+      .filter(Boolean);
+    const combinedServiceName = serviceNames.length > 0
+      ? serviceNames.join(', ')
+      : (data.serviceName || 'General Enquiry');
+
+    // Generate combined requirement summary
+    const combinedRequirement = items.length > 1
+      ? items.map((it, idx) => `[Item ${idx + 1}: ${it.serviceName || 'Service'}] (Qty: ${it.quantity || 'N/A'})\n${it.requirement || 'No additional details'}`).join('\n\n')
+      : (items[0]?.requirement || data.requirement || '');
+
+    const totalQuantity = items.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0) || data.quantity || null;
 
     const enquiry = {
       enquiryId,
       customerName: data.customerName,
       phone: data.phone,
       email: data.email || '',
-      serviceId: data.serviceId || '',
-      serviceName: data.serviceName || '',
-      quantity: data.quantity || null,
-      requirement: data.requirement || '',
+      serviceId: items[0]?.serviceId || data.serviceId || '',
+      serviceName: combinedServiceName,
+      quantity: totalQuantity,
+      requirement: combinedRequirement,
       additionalNotes: data.additionalNotes || '',
-      dynamicFields: data.dynamicFields || {},
+      dynamicFields: items[0]?.dynamicFields || data.dynamicFields || {},
+      items,
       files: data.files || [],
       status: 'NEW',
       assignedTo: null,
@@ -50,7 +76,7 @@ const enquiryService = {
     };
 
     const result = await firestoreService.addDocument(COLLECTIONS.ENQUIRIES, enquiry);
-    return { ...result, enquiryId };
+    return { ...result, enquiryId, items, serviceName: combinedServiceName };
   },
 
   /**
