@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import HeroCanvas from '../../components/common/HeroCanvas';
+import useScrollReveal from '../../hooks/useScrollReveal';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useBusiness } from '../../contexts/BusinessContext';
@@ -133,22 +135,31 @@ export default function HomePage() {
     ? getLocalized(homepage.hero.subtitle, lang)
     : t('hero.defaultSubtitle');
 
+  const revealRef = useScrollReveal();
+
   return (
-    <main className="home">
+    <main className="home" ref={revealRef}>
       {/* === HERO === */}
       <section className="hero">
+        {/* CMYK Ink blobs drifting in background */}
+        <div className="hero__blob hero__blob--cyan" aria-hidden="true" />
+        <div className="hero__blob hero__blob--magenta" aria-hidden="true" />
+        <div className="hero__blob hero__blob--yellow" aria-hidden="true" />
+        <div className="hero__blob hero__blob--accent" aria-hidden="true" />
+        {/* Canvas particle animation (CMYK streams) */}
+        <HeroCanvas />
         <div className="hero__bg-pattern" aria-hidden="true" />
         <div className="container hero__container">
           <div className="hero__content">
-            <div className="hero__badge">
+            <div className="hero__badge" data-reveal="down" data-reveal-delay="1">
               <Printer size={16} />
-              <span>Printing • Designing • Documents</span>
+              <span>Printing &#x2022; Designing &#x2022; Documents</span>
             </div>
-            <h1 className="hero__title">{heroTitle}</h1>
-            <p className="hero__subtitle">{heroSubtitle}</p>
+            <h1 className="hero__title" data-reveal="up" data-reveal-delay="2">{heroTitle}</h1>
+            <p className="hero__subtitle" data-reveal="up" data-reveal-delay="3">{heroSubtitle}</p>
 
             <div className="hero__actions">
-              <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right" href="/quote">
+              <Button data-reveal="up" data-reveal-delay="4" variant="primary" size="lg" icon={ArrowRight} iconPosition="right" href="/quote">
                 {t('hero.cta')}
               </Button>
               <Button
@@ -173,7 +184,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="hero__info">
+            <div className="hero__info" data-reveal="up" data-reveal-delay="5">
               <div className="hero__info-item">
                 <MapPin size={16} />
                 <span>{business.address?.city || 'Goregaon'}, {business.address?.district || 'Gondia'}</span>
@@ -185,7 +196,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="hero__visual">
+          <div className="hero__visual" data-reveal="right" data-reveal-delay="2">
             {homepage?.hero?.image && !heroImgError ? (
               <div className="hero__banner-preview">
                 <img
@@ -238,7 +249,7 @@ export default function HomePage() {
       {/* === SERVICES === */}
       <section className="section home-services">
         <div className="container">
-          <div className="section-header">
+          <div className="section-header" data-reveal="up">
             <span className="section-label">{t('services.title')}</span>
             <h2>{t('services.title')}</h2>
             <p>{t('services.subtitle')}</p>
@@ -249,7 +260,8 @@ export default function HomePage() {
               services.map((service, i) => {
                 const IconComponent = SERVICE_ICONS[service.slug] || Printer;
                 return (
-                  <Link to={`/services/${service.slug}`} className="service-card" key={service.id || i} style={{ animationDelay: `${i * 0.05}s` }}>
+                  <Link to={`/services/${service.slug}`} className="service-card" key={service.id || i}
+                    data-reveal="scale-up" data-reveal-delay={String((i % 6) + 1)}>
                     <div className="service-card__icon">
                       <IconComponent size={28} />
                     </div>
@@ -285,7 +297,7 @@ export default function HomePage() {
       {/* === WHY CHOOSE US === */}
       <section className="section home-why" style={{ background: 'var(--color-surface-alt)' }}>
         <div className="container">
-          <div className="section-header">
+          <div className="section-header" data-reveal="up">
             <span className="section-label">Why Choose Us</span>
             <h2>Your Local Printing Partner</h2>
             <p>Quality printing services right here in Goregaon</p>
@@ -303,7 +315,7 @@ export default function HomePage() {
             ).map((item, i) => {
               const IconComp = WHY_ICONS[String(item.icon).toLowerCase()] || Printer;
               return (
-                <div className="why-card" key={i} style={{ animationDelay: `${i * 0.1}s` }}>
+                <div className="why-card" key={i} data-reveal="scale" data-reveal-delay={String((i % 4) + 1)}>
                   <div className="why-card__icon">
                     <IconComp size={24} />
                   </div>
@@ -320,14 +332,15 @@ export default function HomePage() {
       {galleryItems.length > 0 && (
         <section className="section home-gallery">
           <div className="container">
-            <div className="section-header">
+            <div className="section-header" data-reveal="up">
               <span className="section-label">{t('gallery.title')}</span>
               <h2>{t('gallery.title')}</h2>
               <p>{t('gallery.subtitle')}</p>
             </div>
             <div className="gallery-preview-grid">
-              {galleryItems.map((item) => (
-                <Link to="/gallery" className="gallery-preview-item" key={item.id} title={getLocalized(item.title, lang)}>
+              {galleryItems.map((item, gi) => (
+                <Link to="/gallery" className="gallery-preview-item" key={item.id} title={getLocalized(item.title, lang)}
+                  data-reveal="scale" data-reveal-delay={String((gi % 6) + 1)}>
                   <img
                     src={formatImageUrl(item.imageUrl || item.thumbnailUrl)}
                     alt={getLocalized(item.altText, lang) || getLocalized(item.title, lang)}

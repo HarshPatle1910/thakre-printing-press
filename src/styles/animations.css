@@ -8,120 +8,166 @@
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50%       { opacity: 0.5; }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
+  0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
 @keyframes bounceIn {
-  0% { transform: scale(0.3); opacity: 0; }
-  50% { transform: scale(1.05); }
-  70% { transform: scale(0.9); }
+  0%   { transform: scale(0.3); opacity: 0; }
+  50%  { transform: scale(1.05); }
+  70%  { transform: scale(0.9); }
   100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50%       { transform: translateY(-8px); }
 }
+
+@keyframes floatRotate {
+  0%   { transform: translateY(0) rotate(0deg); }
+  33%  { transform: translateY(-12px) rotate(7deg); }
+  66%  { transform: translateY(-5px) rotate(-5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* Ink blob drift — hero background blobs */
+@keyframes blobDrift {
+  0%   { transform: translate(0, 0)       scale(1)    rotate(0deg); }
+  25%  { transform: translate(22px,-16px) scale(1.06) rotate(9deg); }
+  50%  { transform: translate(10px, 22px) scale(0.97) rotate(-6deg); }
+  75%  { transform: translate(-20px, 6px) scale(1.04) rotate(11deg); }
+  100% { transform: translate(0, 0)       scale(1)    rotate(0deg); }
+}
+
+@keyframes blobDrift2 {
+  0%   { transform: translate(0, 0)        scale(1)    rotate(0deg); }
+  30%  { transform: translate(-24px, 14px) scale(1.09) rotate(-11deg); }
+  60%  { transform: translate(16px,-20px)  scale(0.95) rotate(6deg); }
+  100% { transform: translate(0, 0)        scale(1)    rotate(0deg); }
+}
+
+@keyframes blobDrift3 {
+  0%   { transform: translate(0, 0)       scale(1)    rotate(0deg); }
+  40%  { transform: translate(18px, 24px) scale(1.04) rotate(12deg); }
+  70%  { transform: translate(-12px,-8px) scale(0.96) rotate(-8deg); }
+  100% { transform: translate(0, 0)       scale(1)    rotate(0deg); }
+}
+
+@keyframes ripple {
+  0%   { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ─────────────────────────────────────────────
+   Scroll Reveal System
+   Add data-reveal="up|down|left|right|scale" to any element.
+   JS adds .revealed when it enters the viewport.
+   ───────────────────────────────────────────── */
+
+[data-reveal] {
+  opacity: 0;
+  transition:
+    opacity 0.68s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+[data-reveal="up"]       { transform: translateY(44px); }
+[data-reveal="down"]     { transform: translateY(-32px); }
+[data-reveal="left"]     { transform: translateX(-44px); }
+[data-reveal="right"]    { transform: translateX(44px); }
+[data-reveal="scale"]    { transform: scale(0.88); }
+[data-reveal="scale-up"] { transform: scale(0.88) translateY(20px); }
+[data-reveal="flip"]     { transform: perspective(700px) rotateY(22deg); }
+
+[data-reveal].revealed {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Stagger delays — add data-reveal-delay="1..8" alongside data-reveal */
+[data-reveal-delay="1"] { transition-delay: 0.07s; }
+[data-reveal-delay="2"] { transition-delay: 0.14s; }
+[data-reveal-delay="3"] { transition-delay: 0.21s; }
+[data-reveal-delay="4"] { transition-delay: 0.28s; }
+[data-reveal-delay="5"] { transition-delay: 0.35s; }
+[data-reveal-delay="6"] { transition-delay: 0.42s; }
+[data-reveal-delay="7"] { transition-delay: 0.49s; }
+[data-reveal-delay="8"] { transition-delay: 0.56s; }
 
 /* Animation utility classes */
-.animate-fade-in {
-  animation: fadeIn var(--transition-base) ease-out;
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp var(--transition-slow) ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn var(--transition-base) ease-out;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-.animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
+.animate-fade-in    { animation: fadeIn var(--transition-base) ease-out; }
+.animate-fade-in-up { animation: fadeInUp var(--transition-slow) ease-out; }
+.animate-scale-in   { animation: scaleIn var(--transition-base) ease-out; }
+.animate-spin       { animation: spin 1s linear infinite; }
+.animate-pulse      { animation: pulse 2s ease-in-out infinite; }
+.animate-float      { animation: float 3.5s ease-in-out infinite; }
 
 /* Staggered animation delays */
 .stagger-1 { animation-delay: 0.05s; }
-.stagger-2 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.10s; }
 .stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.2s; }
+.stagger-4 { animation-delay: 0.20s; }
 .stagger-5 { animation-delay: 0.25s; }
-.stagger-6 { animation-delay: 0.3s; }
+.stagger-6 { animation-delay: 0.30s; }
 
 /* Skeleton loading */
 .skeleton {
-  background: linear-gradient(90deg, var(--color-border-light) 25%, var(--color-surface-alt) 50%, var(--color-border-light) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-border-light) 25%,
+    var(--color-surface-alt)  50%,
+    var(--color-border-light) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: var(--radius-md);
+}
+
+/* Disable all animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .animate-float,
+  .animate-pulse,
+  .animate-spin { animation: none !important; }
 }
