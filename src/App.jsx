@@ -46,18 +46,23 @@ import UsersPage from './pages/admin/UsersPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage';
 import SettingsPage from './pages/admin/SettingsPage';
 
-/** Show splash only on the very first visit per browser session */
-const hasSeenSplash = sessionStorage.getItem('tpp_splash_seen');
+/** Show splash only on first visit per session (or forced via ?splash=1) */
+function checkShouldShowSplash() {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('splash')) return true;
+  return !sessionStorage.getItem('tpp_splash_seen');
+}
 
 export default function App() {
-  const [splashDone, setSplashDone] = useState(!!hasSeenSplash);
+  const [splashDone, setSplashDone] = useState(!checkShouldShowSplash());
 
   function handleSplashDone() {
     sessionStorage.setItem('tpp_splash_seen', '1');
     setSplashDone(true);
   }
 
-  // Don't skip splash for admin routes — they go straight in without it
+  // Don't show splash for admin routes
   const isAdminRoute = window.location.pathname.startsWith('/admin');
 
   if (!splashDone && !isAdminRoute) {

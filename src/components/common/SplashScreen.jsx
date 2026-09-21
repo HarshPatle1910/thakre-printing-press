@@ -1,99 +1,136 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Volume2, VolumeX, FastForward, Sparkles } from 'lucide-react';
+import splashVideo from '../../assets/animation_starting_splash.mp4';
 import './SplashScreen.css';
 
 /**
- * SplashScreen — Cinematic loading animation for Thakre Printing Press.
- *
- * Shows a printing-press workflow (roller, paper feed, ink, printed lines,
- * stamp) for ~2.8 s, then fades out and calls onDone() to unmount itself.
- *
- * Usage in App.jsx:
- *   const [showSplash, setShowSplash] = useState(true);
- *   if (showSplash) return <SplashScreen onDone={() => setShowSplash(false)} />;
+ * SplashScreen — Cinematic AI Video Intro for Thakre Printing Press.
+ * Plays the starting animation video with progress tracking, sound toggle,
+ * and a skip button.
  */
 export default function SplashScreen({ onDone }) {
   const [exiting, setExiting] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const videoRef = useRef(null);
+  const completedRef = useRef(false);
+
+  function finishSplash() {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setExiting(true);
+    setTimeout(() => {
+      onDone?.();
+    }, 600); // matches CSS exit transition
+  }
 
   useEffect(() => {
-    // Prefer reduced-motion → skip early
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const displayMs = prefersReduced ? 800 : 2900;
-    const exitMs    = prefersReduced ? 300 : 650; // must match CSS transition
+    if (prefersReduced) {
+      finishSplash();
+      return;
+    }
 
-    const exitTimer = setTimeout(() => setExiting(true), displayMs);
-    const doneTimer = setTimeout(() => onDone?.(), displayMs + exitMs);
+    // Safety timeout — the video is 5.04s, so 6.2s is a safe maximum limit
+    const safetyTimer = setTimeout(() => {
+      finishSplash();
+    }, 6200);
 
-    return () => {
-      clearTimeout(exitTimer);
-      clearTimeout(doneTimer);
-    };
-  }, [onDone]);
+    return () => clearTimeout(safetyTimer);
+  }, []);
+
+  function handleTimeUpdate() {
+    if (videoRef.current && videoRef.current.duration) {
+      const current = videoRef.current.currentTime;
+      const total = videoRef.current.duration;
+      setProgress(Math.min(100, Math.round((current / total) * 100)));
+    }
+  }
+
+  function toggleSound() {
+    if (videoRef.current) {
+      const nextMuted = !isMuted;
+      videoRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
+    }
+  }
 
   return (
     <div
       className={`splash${exiting ? ' splash--exiting' : ''}`}
-      aria-label="Loading Thakre Printing Press"
-      aria-live="polite"
-      role="status"
+      aria-label="Welcome to Thakre Printing Press"
+      role="dialog"
+      aria-modal="true"
     >
-      {/* Dot-grid background glow */}
-      <div className="splash__bg" aria-hidden="true" />
+      {/* Background ambient glow effect */}
+      <div className="splash__ambient-backdrop" aria-hidden="true" />
 
-      {/* Floating ink particles */}
-      <div className="splash__particles" aria-hidden="true">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <span key={i} className="splash__particle" />
-        ))}
-      </div>
-
-      {/* ── Printing press animation stage ── */}
-      <div className="splash__stage" aria-hidden="true">
-        {/* Ink roller that descends and presses the paper */}
-        <div className="splash__roller" />
-
-        {/* Paper feeding in from the bottom */}
-        <div className="splash__paper">
-          {/* Ink wash overlay after roller pass */}
-          <div className="splash__ink" />
-
-          {/* Printed text lines revealing left-to-right */}
-          <div className="splash__lines">
-            <div className="splash__line" />
-            <div className="splash__line" />
-            <div className="splash__line" />
-            <div className="splash__line" />
+      {/* Top action bar: Brand name & Skip button */}
+      <header className="splash__header">
+        <div className="splash__brand">
+          <div className="splash__brand-icon">
+            <Sparkles size={18} />
           </div>
-
-          {/* Check-mark stamp popping in bottom-right */}
-          <div className="splash__stamp">
-            {/* Checkmark SVG */}
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+          <div className="splash__brand-text">
+            <span className="splash__brand-name">THAKRE PRINTING PRESS</span>
+            <span className="splash__brand-tag">Goregaon • Gondia</span>
           </div>
         </div>
-      </div>
 
-      {/* ── Brand identity ── */}
-      <div className="splash__logo">
-        <div className="splash__logo-icon">
-          {/* Printer icon */}
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <polyline points="6 9 6 2 18 2 18 9" />
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-            <rect x="6" y="14" width="12" height="8" />
-          </svg>
-        </div>
-        <div className="splash__logo-text">
-          <span className="splash__logo-name">Thakre Printing Press</span>
-          <span className="splash__logo-tagline">Print · Design · Documents</span>
-        </div>
-      </div>
+        <div className="splash__controls">
+          <button
+            type="button"
+            className="splash__btn splash__btn--sound"
+            onClick={toggleSound}
+            title={isMuted ? 'Unmute video' : 'Mute video'}
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          >
+            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
 
-      {/* ── Progress bar ── */}
-      <div className="splash__progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-        <div className="splash__progress-bar" />
-      </div>
+          <button
+            type="button"
+            className="splash__btn splash__btn--skip"
+            onClick={finishSplash}
+            title="Skip intro"
+            aria-label="Skip intro animation"
+          >
+            <span>Skip</span>
+            <FastForward size={16} />
+          </button>
+        </div>
+      </header>
+
+      {/* Video Container Stage */}
+      <main className="splash__stage">
+        <div className="splash__video-wrapper">
+          <video
+            ref={videoRef}
+            className="splash__video"
+            src={splashVideo}
+            autoPlay
+            playsInline
+            muted={isMuted}
+            preload="auto"
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={finishSplash}
+            onError={finishSplash}
+          />
+          {/* Subtle gradient vignette frame */}
+          <div className="splash__video-overlay" aria-hidden="true" />
+        </div>
+      </main>
+
+      {/* Bottom status & progress bar */}
+      <footer className="splash__footer">
+        <div className="splash__caption">
+          <span className="splash__caption-dot" />
+          <span>Starting Press Engine... High Quality Printing & Design</span>
+        </div>
+        <div className="splash__progress-track" role="progressbar" aria-valuenow={progress} aria-valuemin="0" aria-valuemax="100">
+          <div className="splash__progress-fill" style={{ width: `${progress}%` }} />
+        </div>
+      </footer>
     </div>
   );
 }

@@ -402,6 +402,193 @@
   margin-top: var(--space-10);
 }
 
+/* === OFFICIAL & CITIZEN FORMS === */
+.home-forms {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.home-forms__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
+}
+
+.home-form-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.home-form-card:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.home-form-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.home-form-card__badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-100);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.home-form-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: #10b981;
+}
+
+.home-form-card__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  flex: 1;
+  margin-bottom: var(--space-5);
+}
+
+.home-form-card__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(45, 106, 79, 0.1) 0%, rgba(0, 180, 216, 0.12) 100%);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.home-form-card__title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  line-height: 1.35;
+  margin-bottom: var(--space-2);
+}
+
+.home-form-card__desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.home-form-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-light);
+}
+
+.home-form-card__meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.home-form-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-light);
+  transition: all var(--transition-fast);
+}
+
+.home-form-card:hover .home-form-card__link {
+  color: var(--color-primary);
+  transform: translateX(3px);
+}
+
+/* Forms assistance banner */
+.home-forms__banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  background: linear-gradient(135deg, #0b2218 0%, #1b4332 60%, #2d6a4f 100%);
+  color: #ffffff;
+  padding: var(--space-8) var(--space-10);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 12px 36px rgba(11, 34, 24, 0.25);
+}
+
+.home-forms__banner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+  color: #ffe6a7;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-3);
+}
+
+.home-forms__banner-content h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
+  margin-bottom: var(--space-2);
+}
+
+.home-forms__banner-content p {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: var(--font-size-sm);
+  max-width: 650px;
+  line-height: 1.6;
+}
+
+.home-forms__banner-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .home-forms__banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-6);
+  }
+
+  .home-forms__banner-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .home-forms__banner-actions .btn {
+    width: 100%;
+  }
+}
+
 /* === WHY CHOOSE US === */
 .why-grid {
   display: grid;

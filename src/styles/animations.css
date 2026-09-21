@@ -118,7 +118,7 @@
 
 [data-reveal].revealed {
   opacity: 1 !important;
-  transform: none !important;
+  transform: none;
 }
 
 /* Stagger delays — add data-reveal-delay="1..8" alongside data-reveal */
