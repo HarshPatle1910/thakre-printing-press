@@ -121,7 +121,7 @@ const firestoreService = {
   // --- Counter ---
   async incrementCounter(collectionName, docId, field, amount = 1) {
     const docRef = doc(db, collectionName, docId);
-    await updateDoc(docRef, { [field]: increment(amount) });
+    await setDoc(docRef, { [field]: increment(amount), updatedAt: serverTimestamp() }, { merge: true });
   },
 
   // --- Helpers ---
