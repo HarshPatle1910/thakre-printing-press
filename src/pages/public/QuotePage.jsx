@@ -168,9 +168,9 @@ export default function QuotePage() {
     // Customer info validation
     if (!form.customerName.trim()) newErrors.customerName = 'Name is required';
     if (!form.phone.trim()) {
-      newErrors.phone = 'Mobile number is required';
-    } else if (!/^\d{10}$/.test(form.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Enter a valid 10-digit number';
+      newErrors.phone = 'Mobile number is required to receive your quote';
+    } else if (form.phone.replace(/\D/g, '').length !== 10) {
+      newErrors.phone = 'Please enter a valid 10-digit mobile number';
     }
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       newErrors.email = 'Enter a valid email address';
@@ -334,16 +334,31 @@ export default function QuotePage() {
               {errors.customerName && <div className="form-error">{errors.customerName}</div>}
             </div>
 
-            {/* Phone */}
+            {/* Phone (Required) */}
             <div className="form-group">
-              <label className="form-label">{t('quote.mobile')} <span className="required">*</span></label>
+              <label className="form-label" htmlFor="customerPhone">
+                {t('quote.mobile')} <span className="required">* (Required)</span>
+              </label>
               <input
+                id="customerPhone"
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                maxLength={10}
+                autoComplete="tel"
+                required
                 className={`form-input ${errors.phone ? 'form-input--error' : ''}`}
                 value={form.phone}
-                onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-                placeholder="10-digit mobile number"
+                onChange={(e) => {
+                  const cleaned = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setForm((prev) => ({ ...prev, phone: cleaned }));
+                  if (errors.phone) setErrors((prev) => ({ ...prev, phone: null }));
+                }}
+                placeholder="10-digit mobile number (e.g. 9876543210)"
               />
+              <small className="form-hint" style={{ display: 'block', marginTop: '4px' }}>
+                Required to receive quote & updates via Call / WhatsApp
+              </small>
               {errors.phone && <div className="form-error">{errors.phone}</div>}
             </div>
 
