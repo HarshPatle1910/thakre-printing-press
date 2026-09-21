@@ -385,21 +385,27 @@ export default function AnalyticsPage() {
       </section>
 
       {/* Daily Activity Chart */}
-      {dailyActivity.length > 0 && (
-        <section className="admin-card" style={{ marginBottom: 'var(--space-6)' }}>
-          <div className="admin-card__header flex-between">
-            <div>
-              <h2>Recent Daily Traffic & Activity</h2>
-              <p>Daily breakdown of website visits over time</p>
-            </div>
+      <section className="admin-card" style={{ marginBottom: 'var(--space-6)' }}>
+        <div className="admin-card__header flex-between">
+          <div>
+            <h2>Recent Daily Traffic & Activity</h2>
+            <p>Daily breakdown of website visits over time</p>
+          </div>
+          {dailyActivity.length > 0 && (
             <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span style={{ width: '10px', height: '10px', background: 'var(--color-primary)', borderRadius: '2px', display: 'inline-block' }} />
                 Page Views
               </span>
             </div>
-          </div>
+          )}
+        </div>
 
+        {dailyActivity.length === 0 ? (
+          <p style={{ color: 'var(--color-text-secondary)', padding: 'var(--space-4) 0', margin: 0 }}>
+            No visitor activity recorded yet. Live chart will populate automatically as visitors browse the website.
+          </p>
+        ) : (
           <div className="chart-container">
             <div className="activity-chart">
               {dailyActivity.map((day) => (
@@ -416,8 +422,8 @@ export default function AnalyticsPage() {
               ))}
             </div>
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* 2-Column Analytics Details */}
       <div className="analytics-details-grid">
@@ -496,45 +502,51 @@ export default function AnalyticsPage() {
           <p>Real breakdown of page visits across public sections of Thakre Printing Press</p>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
-          <table className="pages-table">
-            <thead>
-              <tr>
-                <th>Page Name</th>
-                <th>URL Path</th>
-                <th>Views</th>
-                <th style={{ minWidth: '160px' }}>Traffic Share</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topPages.map((page) => (
-                <tr key={page.path}>
-                  <td>
-                    <strong>{page.label}</strong>
-                  </td>
-                  <td>
-                    <code style={{ fontSize: '12px', background: 'var(--color-surface)', padding: '2px 6px', borderRadius: '4px' }}>
-                      {page.path}
-                    </code>
-                  </td>
-                  <td>
-                    <strong>{page.count.toLocaleString()}</strong>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ flex: 1 }} className="page-cell-bar">
-                        <div className="page-cell-fill" style={{ width: `${page.percentage}%` }} />
-                      </div>
-                      <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', minWidth: '35px' }}>
-                        {page.percentage}%
-                      </span>
-                    </div>
-                  </td>
+        {topPages.length === 0 ? (
+          <p style={{ color: 'var(--color-text-secondary)', padding: 'var(--space-4) 0', margin: 0 }}>
+            No page visits logged yet for this reporting window.
+          </p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="pages-table">
+              <thead>
+                <tr>
+                  <th>Page Name</th>
+                  <th>URL Path</th>
+                  <th>Views</th>
+                  <th style={{ minWidth: '160px' }}>Traffic Share</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {topPages.map((page) => (
+                  <tr key={page.path}>
+                    <td>
+                      <strong>{page.label}</strong>
+                    </td>
+                    <td>
+                      <code style={{ fontSize: '12px', background: 'var(--color-surface)', padding: '2px 6px', borderRadius: '4px' }}>
+                        {page.path}
+                      </code>
+                    </td>
+                    <td>
+                      <strong>{page.count.toLocaleString()}</strong>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ flex: 1 }} className="page-cell-bar">
+                          <div className="page-cell-fill" style={{ width: `${page.percentage}%` }} />
+                        </div>
+                        <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', minWidth: '35px' }}>
+                          {page.percentage}%
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );
