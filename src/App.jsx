@@ -45,16 +45,24 @@ import AnalyticsPage from './pages/admin/AnalyticsPage';
 import UsersPage from './pages/admin/UsersPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage';
 import SettingsPage from './pages/admin/SettingsPage';
-
-/** Show splash only on first visit per session (or forced via ?splash=1) */
-function checkShouldShowSplash() {
-  if (typeof window === 'undefined') return false;
-  const params = new URLSearchParams(window.location.search);
-  if (params.has('splash')) return true;
-  return !sessionStorage.getItem('tpp_splash_seen');
-}
+import { useBusiness } from './contexts/BusinessContext';
+import { Phone, MessageCircle, AlertTriangle } from 'lucide-react';
 
 export default function App() {
+  const { business, settings } = useBusiness();
+  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+
+  // Splash logic driven by settings
+  const isSplashEnabled = settings?.enableSplashScreen !== false && settings?.splashFrequency !== 'disabled';
+  
+  const checkShouldShowSplash = () => {
+    if (typeof window === 'undefined' || !isSplashEnabled) return false;
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('splash')) return true;
+    if (settings?.splashFrequency === 'always') return true;
+    return !sessionStorage.getItem('tpp_splash_seen');
+  };
+
   const [splashDone, setSplashDone] = useState(!checkShouldShowSplash());
 
   function handleSplashDone() {
@@ -62,11 +70,99 @@ export default function App() {
     setSplashDone(true);
   }
 
-  // Don't show splash for admin routes
-  const isAdminRoute = window.location.pathname.startsWith('/admin');
-
-  if (!splashDone && !isAdminRoute) {
+  // Show splash if active and not an admin route
+  if (!splashDone && !isAdminRoute && isSplashEnabled) {
     return <SplashScreen onDone={handleSplashDone} />;
+  }
+
+  // Maintenance screen if active and not on /admin
+  if (settings?.maintenanceMode && !isAdminRoute) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        textAlign: 'center',
+        background: '#0B0F19',
+        color: '#F8FAFC',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          maxWidth: '560px',
+          width: '100%',
+          background: 'rgba(30, 41, 59, 0.75)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '20px',
+          padding: '40px 28px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+        }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: 'rgba(234, 88, 12, 0.15)',
+            color: '#F97316',
+            marginBottom: '20px'
+          }}>
+            <AlertTriangle size={32} />
+          </div>
+          <h1 style={{ fontSize: '26px', fontWeight: '700', marginBottom: '12px' }}>
+            {business?.name || 'Thakre Printing Press'}
+          </h1>
+          <p style={{ fontSize: '15px', color: '#CBD5E1', lineHeight: '1.6', marginBottom: '28px' }}>
+            {settings?.maintenanceMessage || 'Our website is currently undergoing scheduled updates. For urgent printing orders, please call us or message on WhatsApp.'}
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
+            <a
+              href={`https://wa.me/91${business?.whatsapp || '9923113085'}?text=Hello%20Thakre%20Printing%20Press`}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                background: '#25D366',
+                color: '#fff',
+                borderRadius: '10px',
+                fontWeight: '600',
+                textDecoration: 'none'
+              }}
+            >
+              <MessageCircle size={18} /> WhatsApp Us
+            </a>
+            <a
+              href={`tel:+91${business?.phone || '9923113085'}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                background: '#E11D48',
+                color: '#fff',
+                borderRadius: '10px',
+                fontWeight: '600',
+                textDecoration: 'none'
+              }}
+            >
+              <Phone size={18} /> Call Us
+            </a>
+          </div>
+          <div style={{ marginTop: '32px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
+            <a href="/admin/login" style={{ fontSize: '13px', color: '#94A3B8', textDecoration: 'none' }}>
+              Staff & Admin Portal &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

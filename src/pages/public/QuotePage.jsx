@@ -345,7 +345,7 @@ function createNewItem(serviceId = '') {
 
 export default function QuotePage() {
   const { t, i18n } = useTranslation();
-  const { business } = useBusiness();
+  const { business, settings } = useBusiness();
   const lang = i18n.language;
   const [searchParams] = useSearchParams();
   const preSelectedService = searchParams.get('service') || '';
@@ -422,6 +422,8 @@ export default function QuotePage() {
 
   // Handle adding another service item
   const handleAddItem = () => {
+    const maxItems = Number(settings?.maxServicesPerQuote) || 10;
+    if (items.length >= maxItems) return;
     setItems((prev) => [...prev, createNewItem()]);
   };
 
@@ -869,21 +871,23 @@ export default function QuotePage() {
           </div>
 
           {/* Add Another Service Button */}
-          <div className="quote-add-item-wrap">
-            <button
-              type="button"
-              className="quote-add-item-btn"
-              onClick={handleAddItem}
-            >
-              <div className="quote-add-item-btn__icon">
-                <Plus size={18} />
-              </div>
-              <div className="quote-add-item-btn__text">
-                <strong>+ Add Another Service or Requirement</strong>
-                <span>Add Visiting Cards, Banners, Wedding Cards, Bill Books, or Forms to this quote</span>
-              </div>
-            </button>
-          </div>
+          {settings?.allowMultiServiceQuotes !== false && items.length < (Number(settings?.maxServicesPerQuote) || 10) && (
+            <div className="quote-add-item-wrap">
+              <button
+                type="button"
+                className="quote-add-item-btn"
+                onClick={handleAddItem}
+              >
+                <div className="quote-add-item-btn__icon">
+                  <Plus size={18} />
+                </div>
+                <div className="quote-add-item-btn__text">
+                  <strong>+ Add Another Service or Requirement</strong>
+                  <span>Add Visiting Cards, Banners, Wedding Cards, Bill Books, or Forms to this quote</span>
+                </div>
+              </button>
+            </div>
+          )}
 
           {/* Additional notes for the entire enquiry */}
           <div className="form-group" style={{ marginTop: 'var(--space-6)' }}>

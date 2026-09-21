@@ -53,9 +53,29 @@ const DEFAULT_HOURS = {
   sunday:    { open: '',      close: '',      closed: true },
 };
 
+const DEFAULT_SETTINGS = {
+  enquiryPrefix: 'TP-',
+  enquiryCounter: 0,
+  allowMultiServiceQuotes: true,
+  maxServicesPerQuote: 10,
+  requireCustomerPhone: true,
+  autoWhatsAppRedirect: true,
+  enableQuoteFileUpload: false,
+  maxFileSizeMb: 10,
+  allowedExtensions: 'pdf, jpg, jpeg, png, doc, docx, cdr, psd, ai',
+  enableSplashScreen: true,
+  splashFrequency: 'session',
+  enableAnalyticsTracking: true,
+  defaultLanguage: 'en',
+  maintenanceMode: false,
+  maintenanceMessage: 'Our website is currently undergoing scheduled updates. For urgent printing orders, please call us or message on WhatsApp at +91 99231 13085.',
+  storageProvider: 'Google Drive (via Cloud Proxy)',
+};
+
 export function BusinessProvider({ children }) {
   const [business, setBusiness] = useState(DEFAULT_BUSINESS);
   const [openingHours, setOpeningHours] = useState(DEFAULT_HOURS);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -87,9 +107,22 @@ export function BusinessProvider({ children }) {
       }
     );
 
+    const unsubSettings = onSnapshot(
+      doc(db, COLLECTIONS.SETTINGS, 'general'),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setSettings((prev) => ({ ...DEFAULT_SETTINGS, ...docSnap.data() }));
+        }
+      },
+      (err) => {
+        console.error('Error loading settings data:', err);
+      }
+    );
+
     return () => {
       unsubBusiness();
       unsubHours();
+      unsubSettings();
     };
   }, []);
 
@@ -118,6 +151,7 @@ export function BusinessProvider({ children }) {
   const value = {
     business,
     openingHours,
+    settings,
     loading,
     error,
     getLocalizedField,

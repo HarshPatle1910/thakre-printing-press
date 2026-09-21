@@ -7,18 +7,20 @@ const enquiryService = {
    */
   async generateEnquiryId() {
     try {
-      // Get current counter
+      // Get current counter and prefix from settings
       const settings = await firestoreService.getDocument(COLLECTIONS.SETTINGS, 'general');
+      const rawPrefix = settings?.enquiryPrefix || ENQUIRY_PREFIX;
+      const prefix = rawPrefix.endsWith('-') ? rawPrefix.slice(0, -1) : rawPrefix;
       const currentCounter = settings?.enquiryCounter || 0;
       const newCounter = currentCounter + 1;
 
-      // Update counter
+      // Update counter in settings
       await firestoreService.setDocument(COLLECTIONS.SETTINGS, 'general', {
         enquiryCounter: newCounter,
       });
 
       // Format: TP-000001
-      return `${ENQUIRY_PREFIX}-${String(newCounter).padStart(6, '0')}`;
+      return `${prefix}-${String(newCounter).padStart(6, '0')}`;
     } catch (error) {
       // Fallback: use timestamp-based ID
       const ts = Date.now().toString().slice(-6);
