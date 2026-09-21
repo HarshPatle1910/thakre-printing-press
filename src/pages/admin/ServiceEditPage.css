@@ -32,3 +32,11 @@
   display: block;
   margin-bottom: var(--space-1);
 }
+
+.dynamic-field-options-row {
+  grid-column: 1 / -1;
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--color-border-light);
+  margin-top: var(--space-1);
+}
+

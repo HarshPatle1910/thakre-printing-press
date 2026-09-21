@@ -228,7 +228,10 @@ export default function EnquiryDetailPage() {
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '6px', fontSize: '12px' }}>
                             {Object.entries(item.dynamicFields).map(([k, v]) => (
                               <div key={k}>
-                                <strong style={{ color: 'var(--color-text-secondary)' }}>{k}:</strong> {String(v)}
+                                <strong style={{ color: 'var(--color-text-secondary)' }}>
+                                  {k.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}:
+                                </strong>{' '}
+                                {String(v)}
                               </div>
                             ))}
                           </div>

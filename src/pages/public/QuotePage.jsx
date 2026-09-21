@@ -13,6 +13,326 @@ import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import './QuotePage.css';
 
+/**
+ * Rich specifications & dropdown options for each service category.
+ * Used to ensure dropdowns are never empty and all essential job requirements are asked.
+ */
+export const SERVICE_SPEC_DEFAULTS = {
+  'flex-banner-printing': [
+    {
+      name: 'material',
+      label: { en: 'Flex Material', mr: 'फ्लेक्स मटेरियल', hi: 'फ्लेक्स मटेरियल' },
+      type: 'select',
+      required: true,
+      options: [
+        'Normal Star Flex (Standard 280 GSM)',
+        'Heavy Duty Star Flex (Premium 340 GSM - Gloss)',
+        'Blackout Flex (100% Non-Transparent / Heavy)',
+        'Backlit Flex (For Glowing Light Board)',
+        'Vinyl Sticker / Eco-Solvent (High Definition)',
+        'One Way Vision / Mesh Banner',
+      ],
+    },
+    {
+      name: 'dimensions',
+      label: { en: 'Banner Size (Width × Height)', mr: 'बॅनर आकार', hi: 'बैनर का आकार' },
+      type: 'select',
+      required: true,
+      options: [
+        '6 × 3 Feet (Standard Shop Board)',
+        '8 × 4 Feet (Popular Event / Hoarding)',
+        '10 × 5 Feet (Large Outdoor)',
+        '12 × 6 Feet (Commercial Board)',
+        'Custom Size (Specified in requirements below)',
+      ],
+    },
+    {
+      name: 'fitting',
+      label: { en: 'Fitting & Eyelets', mr: 'फिटिंग आणि आयलेट्स', hi: 'फिटिंग और आईलेट्स' },
+      type: 'select',
+      required: false,
+      options: [
+        'Eyelets (Metal Rings on all 4 corners/edges)',
+        'Border Pocket (For Iron Pipe Insertion)',
+        'Direct Pasting on Foam Sheet / Sunboard',
+        'No Fitting (Raw Printed Roll)',
+      ],
+    },
+  ],
+
+  'visiting-cards': [
+    {
+      name: 'paperType',
+      label: { en: 'Card Paper Type', mr: 'कार्ड पेपर प्रकार', hi: 'कार्ड पेपर प्रकार' },
+      type: 'select',
+      required: true,
+      options: [
+        '350 GSM Premium Art Card (Standard & Durable)',
+        '400 GSM Ultra-Thick Card',
+        'Textured Ivory / Royal Linen Paper',
+        'Metallic Shimmer Card (Gold / Silver Sheen)',
+        'Plastic / Transparent Tear-Proof Card',
+      ],
+    },
+    {
+      name: 'finish',
+      label: { en: 'Lamination Finish', mr: 'लॅमिनेशन फिनिश', hi: 'लेमिनेशन फिनिश' },
+      type: 'select',
+      required: true,
+      options: [
+        'Matte Lamination (Elegant & Non-reflective)',
+        'Gloss Lamination (High Shine & Vibrant)',
+        'Velvet Touch / Soft-Feel Lamination',
+        'Spot UV + Matte (Raised Gloss on Logo/Name)',
+        'Gold Foil Embossed + Velvet Matte',
+        'Non-Laminated Natural Texture',
+      ],
+    },
+    {
+      name: 'sides',
+      label: { en: 'Printing Sides', mr: 'प्रिंटिंग बाजू', hi: 'प्रिंटिंग साइड्स' },
+      type: 'select',
+      required: true,
+      options: [
+        'Single Side Printing',
+        'Both Sides Front & Back Printing',
+      ],
+    },
+  ],
+
+  'wedding-cards': [
+    {
+      name: 'invitationType',
+      label: { en: 'Occasion / Event', mr: 'प्रसंग / कार्यक्रम', hi: 'अवसर / कार्यक्रम' },
+      type: 'select',
+      required: true,
+      options: [
+        'Wedding Ceremony (शुभ विवाह)',
+        'Engagement Ceremony (साखरपुडा)',
+        'Housewarming Ceremony (वास्तुशांती)',
+        'Birthday / Anniversary (वाढदिवस)',
+        'Religious Pooja / Katha (धार्मिक पूजा)',
+        'Official / Corporate Opening (उद्घाटन)',
+      ],
+    },
+    {
+      name: 'cardStyle',
+      label: { en: 'Invitation Card Style', mr: 'पत्रिका प्रकार / डिझाइन', hi: 'निमंत्रण पत्रिका शैली' },
+      type: 'select',
+      required: true,
+      options: [
+        'Traditional Marathi Folding Card with Envelope',
+        'Single Premium Insert Sheet with Jacket',
+        'Laser-Cut Royal Box Style',
+        'Scroll / Farman Style Card (शाही फरमान)',
+        'Budget Economic Handout Card',
+      ],
+    },
+    {
+      name: 'eventDate',
+      label: { en: 'Wedding / Event Date (Approx)', mr: 'कार्यक्रमाची तारीख', hi: 'कार्यक्रम की तारीख' },
+      type: 'text',
+      required: false,
+    },
+  ],
+
+  'government-forms': [
+    {
+      name: 'formCategory',
+      label: { en: 'Form / Document Type', mr: 'अर्ज / दस्तऐवज प्रकार', hi: 'फॉर्म / दस्तावेज प्रकार' },
+      type: 'select',
+      required: true,
+      options: [
+        '7/12 Land Revenue Extract (७/१२ जमीन महसूल उतारा)',
+        'Affidavit / Stamp Paper Format (प्रतिज्ञापत्र नमुना)',
+        'Caste Certificate & Validity Form (जात प्रमाणपत्र)',
+        'Income Certificate Application (उत्पन्न दाखला)',
+        'RTO Driving License / Learner Form (आरटीओ अर्ज)',
+        'MahaDBT / Scholarship Online Form (महाडीबीटी)',
+        'Gazette / Name Change Affidavit (राजपत्र / नाव बदल)',
+        'General Legal / Court Application (न्यायालयीन अर्ज)',
+      ],
+    },
+    {
+      name: 'assistanceType',
+      label: { en: 'Assistance Needed', mr: 'आवश्यक मदत', hi: 'आवश्यक सहायता' },
+      type: 'select',
+      required: true,
+      options: [
+        'Ready-made Blank Official Form Printout',
+        'Computer Marathi / English Typing & Printout',
+        'Stamp Paper Affidavit Drafting & Notary guidance',
+        'Online Portal Form Submission Assistance',
+      ],
+    },
+  ],
+
+  'bill-books-registers': [
+    {
+      name: 'bookSize',
+      label: { en: 'Book / Register Size', mr: 'पुस्तक / रजिस्टर आकार', hi: 'बुक / रजिस्टर साइज' },
+      type: 'select',
+      required: true,
+      options: [
+        'A4 Size (8.27 × 11.69 inches - Full Page)',
+        'A5 Size (5.83 × 8.27 inches - Half Page - Most Popular)',
+        '1/4 Size (Medium Commercial Format)',
+        '1/8 Pocket Size (Cash Memo / Delivery Receipt)',
+      ],
+    },
+    {
+      name: 'copyType',
+      label: { en: 'Copies per Set', mr: 'प्रतींचे प्रकार', hi: 'प्रतियों का प्रकार' },
+      type: 'select',
+      required: true,
+      options: [
+        'Duplicate (1+1 NCR Carbonless - White + Pink)',
+        'Triplicate (1+2 NCR Carbonless - White + Pink + Yellow)',
+        'Single Copy Book (Regular Paper with Carbon Sheet)',
+        'Hardbound Register (Ruled / Ledger Paper)',
+      ],
+    },
+    {
+      name: 'numbering',
+      label: { en: 'Serial Numbering', mr: 'अनुक्रमांक / नंबरिंग', hi: 'क्रम संख्या / नंबरिंग' },
+      type: 'select',
+      required: false,
+      options: [
+        'Yes - Sequential Red Serial Numbering (001 to ...)',
+        'No - Without Numbering',
+      ],
+    },
+  ],
+
+  'xerox': [
+    {
+      name: 'printType',
+      label: { en: 'Print Quality & Color', mr: 'प्रिंट प्रकार', hi: 'प्रिंट प्रकार' },
+      type: 'select',
+      required: true,
+      options: [
+        'High-Speed Black & White Xerox',
+        'Full HD Color Laser Printing',
+        'Glossy Photo Paper Print',
+      ],
+    },
+    {
+      name: 'pageSize',
+      label: { en: 'Page Size', mr: 'कागद आकार', hi: 'कागज का आकार' },
+      type: 'select',
+      required: true,
+      options: [
+        'A4 Standard (75 GSM)',
+        'A4 Heavy (100 GSM Bond Paper)',
+        'A3 Large Sheet',
+        'Legal Size (Green / White)',
+      ],
+    },
+    {
+      name: 'sides',
+      label: { en: 'Sides', mr: 'बाजू', hi: 'साइड्स' },
+      type: 'select',
+      required: true,
+      options: [
+        'Single Side (Front Only)',
+        'Double Sided (Back to Back)',
+      ],
+    },
+  ],
+
+  'lamination': [
+    {
+      name: 'laminationType',
+      label: { en: 'Lamination Type', mr: 'लॅमिनेशन प्रकार', hi: 'लेमिनेशन प्रकार' },
+      type: 'select',
+      required: true,
+      options: [
+        'Thermal Pouch Lamination (ID Cards, Certificates, A4/A3)',
+        'Roll Film Matte Lamination',
+        'Roll Film Gloss Lamination',
+        'Heavy 250 Micron Waterproof Sealed Pouch',
+      ],
+    },
+  ],
+
+  'book-binding': [
+    {
+      name: 'bindingType',
+      label: { en: 'Binding Style', mr: 'बाइंडिंग प्रकार', hi: 'बाइंडिंग प्रकार' },
+      type: 'select',
+      required: true,
+      options: [
+        'Spiral / Coil Binding (with Transparent Sheet Cover)',
+        'Wiro Metal Binding (Professional Look)',
+        'Soft Cover Perfect Glue Binding',
+        'Hard Cover Project Book Binding (with Golden Foil Letters)',
+      ],
+    },
+  ],
+};
+
+/**
+ * Returns required enquiry fields for a given service.
+ * Fallbacks to rich pre-configured defaults if Firestore lacks options or fields.
+ */
+function getServiceEnquiryFields(service) {
+  if (!service) return [];
+  const slug = (service.slug || service.id || '').toLowerCase();
+
+  // Match exact slug or fuzzy match category
+  let defaultFields = SERVICE_SPEC_DEFAULTS[slug];
+  if (!defaultFields) {
+    if (slug.includes('flex') || slug.includes('banner')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['flex-banner-printing'];
+    } else if ((slug.includes('visiting') || slug.includes('business')) && !slug.includes('wedding')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['visiting-cards'];
+    } else if (slug.includes('wedding') || slug.includes('invitation') || slug.includes('patrika')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['wedding-cards'];
+    } else if (slug.includes('form') || slug.includes('govt') || slug.includes('legal')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['government-forms'];
+    } else if (slug.includes('bill') || slug.includes('register') || slug.includes('challan')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['bill-books-registers'];
+    } else if (slug.includes('xerox') || slug.includes('copy')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['xerox'];
+    } else if (slug.includes('lamination')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['lamination'];
+    } else if (slug.includes('bind')) {
+      defaultFields = SERVICE_SPEC_DEFAULTS['book-binding'];
+    }
+  }
+  defaultFields = defaultFields || [];
+
+  const existingFields =
+    Array.isArray(service.enquiryFields) && service.enquiryFields.length > 0
+      ? service.enquiryFields
+      : defaultFields;
+
+  const enrichedExisting = existingFields.map((field) => {
+    const matchDefault = defaultFields.find(
+      (df) => df.name.toLowerCase() === field.name.toLowerCase()
+    );
+    if (field.type === 'select' && (!field.options || field.options.length === 0)) {
+      return {
+        ...field,
+        options: matchDefault?.options || [
+          'Standard Quality',
+          'Premium Quality',
+          'Custom Requirement',
+        ],
+      };
+    }
+    return field;
+  });
+
+  // Also include any essential default spec fields missing from existing
+  const existingNames = new Set(enrichedExisting.map((f) => f.name.toLowerCase()));
+  const missingDefaults = defaultFields.filter(
+    (df) => !existingNames.has(df.name.toLowerCase())
+  );
+
+  return [...enrichedExisting, ...missingDefaults];
+}
+
 function createNewItem(serviceId = '') {
   return {
     id: `item_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -68,7 +388,7 @@ export default function QuotePage() {
         const validServices = activeServices || [];
         setServices(validServices);
 
-        // If pre-selected service is present and first item has no service, pre-select it
+        // Pre-select service and its specification defaults if query param provided
         if (preSelectedService) {
           const match = validServices.find(
             (s) => s.id === preSelectedService || s.slug === preSelectedService
@@ -78,9 +398,10 @@ export default function QuotePage() {
               if (prev.length > 0 && !prev[0].serviceId) {
                 const next = [...prev];
                 next[0] = { ...next[0], serviceId: match.id || match.slug };
-                if (match.enquiryFields) {
+                const fields = getServiceEnquiryFields(match);
+                if (fields && fields.length > 0) {
                   const initialDyn = {};
-                  match.enquiryFields.forEach((f) => { initialDyn[f.name] = ''; });
+                  fields.forEach((f) => { initialDyn[f.name] = ''; });
                   next[0].dynamicFields = initialDyn;
                 }
                 return next;
@@ -108,7 +429,6 @@ export default function QuotePage() {
   const handleRemoveItem = (index) => {
     if (items.length <= 1) return;
     setItems((prev) => prev.filter((_, i) => i !== index));
-    // Clear errors associated with this item
     setErrors((prev) => {
       const next = { ...prev };
       Object.keys(next).forEach((key) => {
@@ -128,16 +448,16 @@ export default function QuotePage() {
 
       if (field === 'serviceId') {
         const svc = services.find((s) => s.id === value || s.slug === value);
+        const fields = getServiceEnquiryFields(svc);
         const initialDyn = {};
-        if (svc?.enquiryFields) {
-          svc.enquiryFields.forEach((f) => { initialDyn[f.name] = ''; });
+        if (fields && fields.length > 0) {
+          fields.forEach((f) => { initialDyn[f.name] = ''; });
         }
         next[index].dynamicFields = initialDyn;
       }
       return next;
     });
 
-    // Clear related error
     if (errors[`item_${index}_${field}`]) {
       setErrors((prev) => ({ ...prev, [`item_${index}_${field}`]: null }));
     }
@@ -184,13 +504,16 @@ export default function QuotePage() {
         if (!item.serviceId) {
           newErrors[`item_${index}_serviceId`] = 'Please select a service';
         }
-        if (!item.requirement.trim()) {
+        const svc = services.find((s) => s.id === item.serviceId || s.slug === item.serviceId);
+        const fields = getServiceEnquiryFields(svc);
+        const hasSpecFields = fields && fields.length > 0;
+
+        if (!hasSpecFields && !item.requirement.trim()) {
           newErrors[`item_${index}_requirement`] = 'Please describe your requirement for this service';
         }
 
-        const svc = services.find((s) => s.id === item.serviceId || s.slug === item.serviceId);
-        if (svc?.enquiryFields) {
-          svc.enquiryFields.forEach((field) => {
+        if (hasSpecFields) {
+          fields.forEach((field) => {
             if (field.required && !item.dynamicFields?.[field.name]?.trim()) {
               newErrors[`item_${index}_dynamic_${field.name}`] = `${getLocalized(field.label, lang)} is required`;
             }
@@ -209,7 +532,6 @@ export default function QuotePage() {
 
     setSubmitting(true);
     try {
-      // Map enriched items with localized service title
       const enrichedItems = items.map((item) => {
         const svc = services.find((s) => s.id === item.serviceId || s.slug === item.serviceId);
         return {
@@ -395,6 +717,7 @@ export default function QuotePage() {
               const selectedSvc = services.find(
                 (s) => s.id === item.serviceId || s.slug === item.serviceId
               );
+              const specFields = getServiceEnquiryFields(selectedSvc);
 
               return (
                 <div className="quote-item-card" key={item.id}>
@@ -460,13 +783,13 @@ export default function QuotePage() {
                   </div>
 
                   {/* Dynamic service-specific fields for this item */}
-                  {selectedSvc?.enquiryFields?.length > 0 && (
+                  {specFields && specFields.length > 0 && (
                     <div className="quote-item-card__dynamic">
                       <span className="quote-item-card__dynamic-title">
-                        {getLocalized(selectedSvc.title, lang)} — Specifications
+                        {getLocalized(selectedSvc?.title, lang)} — Specifications
                       </span>
                       <div className="quote-form__grid">
-                        {selectedSvc.enquiryFields.map((field) => (
+                        {specFields.map((field) => (
                           <div className="form-group" key={field.name}>
                             <label className="form-label">
                               {getLocalized(field.label, lang)}
@@ -478,10 +801,16 @@ export default function QuotePage() {
                                 value={item.dynamicFields[field.name] || ''}
                                 onChange={(e) => handleItemDynamicChange(index, field.name, e.target.value)}
                               >
-                                <option value="">Select...</option>
-                                {field.options?.map((opt) => (
-                                  <option key={opt} value={opt}>{opt}</option>
-                                ))}
+                                <option value="">-- Select {getLocalized(field.label, lang)} --</option>
+                                {field.options?.map((opt, optIdx) => {
+                                  const optVal = typeof opt === 'object' ? (opt.value ?? opt.label) : opt;
+                                  const optLabel = typeof opt === 'object' ? (getLocalized(opt.label, lang) || opt.value) : opt;
+                                  return (
+                                    <option key={optIdx} value={optVal}>
+                                      {optLabel}
+                                    </option>
+                                  );
+                                })}
                               </select>
                             ) : field.type === 'textarea' ? (
                               <textarea
@@ -495,6 +824,7 @@ export default function QuotePage() {
                                 className={`form-input ${errors[`item_${index}_dynamic_${field.name}`] ? 'form-input--error' : ''}`}
                                 value={item.dynamicFields[field.name] || ''}
                                 onChange={(e) => handleItemDynamicChange(index, field.name, e.target.value)}
+                                placeholder={`Enter ${getLocalized(field.label, lang)}`}
                               />
                             )}
                             {errors[`item_${index}_dynamic_${field.name}`] && (
@@ -509,13 +839,24 @@ export default function QuotePage() {
                   {/* Requirement Description */}
                   <div className="form-group" style={{ marginTop: 'var(--space-3)' }}>
                     <label className="form-label">
-                      Requirement & Specifications <span className="required">*</span>
+                      {specFields && specFields.length > 0
+                        ? 'Additional Instructions / Custom Notes'
+                        : 'Requirement & Specifications'}{' '}
+                      {specFields && specFields.length > 0 ? (
+                        <span className="form-hint">({t('quote.optional')})</span>
+                      ) : (
+                        <span className="required">*</span>
+                      )}
                     </label>
                     <textarea
                       className={`form-textarea ${errors[`item_${index}_requirement`] ? 'form-textarea--error' : ''}`}
                       value={item.requirement}
                       onChange={(e) => handleItemChange(index, 'requirement', e.target.value)}
-                      placeholder="Specify size (e.g. 8x4 ft), paper thickness (GSM), matte/gloss finish, binding style, or design details..."
+                      placeholder={
+                        specFields && specFields.length > 0
+                          ? 'Any specific text, custom dimensions, delivery preferences, or design instructions...'
+                          : 'Specify size, paper thickness (GSM), finish, or any other details...'
+                      }
                       rows={3}
                     />
                     {errors[`item_${index}_requirement`] && (

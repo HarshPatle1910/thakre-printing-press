@@ -74,7 +74,12 @@ export default function ServiceEditPage() {
               description: { en: '', mr: '', hi: '', ...(docSnap.description || {}) },
               features: docSnap.features || [],
               subServices: docSnap.subServices || [],
-              enquiryFields: docSnap.enquiryFields || [],
+              enquiryFields: (docSnap.enquiryFields || []).map((f) => ({
+                ...f,
+                optionsText: Array.isArray(f.options)
+                  ? f.options.map((o) => (typeof o === 'string' ? o : o.label?.en || o.value || '')).join(', ')
+                  : '',
+              })),
             });
           }
         } catch (err) {
@@ -134,7 +139,7 @@ export default function ServiceEditPage() {
       ...prev,
       enquiryFields: [
         ...prev.enquiryFields,
-        { name: 'customField', label: { en: 'New Field' }, type: 'text', required: false },
+        { name: 'customField', label: { en: 'New Field' }, type: 'text', required: false, optionsText: '' },
       ],
     }));
   };
@@ -152,8 +157,27 @@ export default function ServiceEditPage() {
     setMessage(null);
 
     try {
+      const cleanedEnquiryFields = (formData.enquiryFields || []).map((f) => {
+        const clean = { ...f };
+        if (clean.type === 'select') {
+          if (typeof clean.optionsText === 'string') {
+            clean.options = clean.optionsText
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean);
+          } else if (!Array.isArray(clean.options)) {
+            clean.options = [];
+          }
+        } else {
+          delete clean.options;
+        }
+        delete clean.optionsText;
+        return clean;
+      });
+
       const payload = {
         ...formData,
+        enquiryFields: cleanedEnquiryFields,
         displayOrder: Number(formData.displayOrder) || 1,
         updatedBy: user?.uid || 'admin',
       };
@@ -433,6 +457,32 @@ export default function ServiceEditPage() {
                 >
                   <Trash2 size={16} />
                 </button>
+
+                {field.type === 'select' && (
+                  <div className="dynamic-field-options-row">
+                    <label className="field-sublabel">Dropdown Choices / Options (Comma-separated)</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={
+                        field.optionsText !== undefined
+                          ? field.optionsText
+                          : Array.isArray(field.options)
+                            ? field.options.map((o) => (typeof o === 'string' ? o : o.label?.en || o.value || '')).join(', ')
+                            : ''
+                      }
+                      placeholder="e.g. Option 1, Option 2, Option 3"
+                      onChange={(e) => {
+                        const updated = [...formData.enquiryFields];
+                        updated[idx].optionsText = e.target.value;
+                        setFormData({ ...formData, enquiryFields: updated });
+                      }}
+                    />
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
+                      Enter choices separated by commas. These will be shown in the quote form dropdown.
+                    </span>
+                  </div>
+                )}
               </div>
             ))}
           </div>

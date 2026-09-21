@@ -50,10 +50,19 @@ const enquiryService = {
       ? serviceNames.join(', ')
       : (data.serviceName || 'General Enquiry');
 
-    // Generate combined requirement summary
-    const combinedRequirement = items.length > 1
-      ? items.map((it, idx) => `[Item ${idx + 1}: ${it.serviceName || 'Service'}] (Qty: ${it.quantity || 'N/A'})\n${it.requirement || 'No additional details'}`).join('\n\n')
-      : (items[0]?.requirement || data.requirement || '');
+    // Generate combined requirement summary including specifications
+    const formatItemDetails = (it, idx) => {
+      const header = items.length > 1 ? `[Item ${idx + 1}: ${it.serviceName || 'Service'}] (Qty: ${it.quantity || 'N/A'})` : '';
+      const specs = it.dynamicFields && Object.keys(it.dynamicFields).length > 0
+        ? Object.entries(it.dynamicFields)
+            .map(([k, v]) => `• ${k.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}: ${v}`)
+            .join('\n')
+        : '';
+      const notes = it.requirement ? `Notes: ${it.requirement}` : '';
+      return [header, specs, notes].filter(Boolean).join('\n');
+    };
+
+    const combinedRequirement = items.map(formatItemDetails).filter(Boolean).join('\n\n') || data.requirement || '';
 
     const totalQuantity = items.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0) || data.quantity || null;
 
